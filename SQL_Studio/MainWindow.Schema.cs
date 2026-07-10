@@ -28,46 +28,55 @@ namespace SQL_Studio
 
             ItemsTree.Items.Clear();
 
-            var tablesNode = new TreeViewItem
-            {
-                Header = "Tables",
-                IsExpanded = true
-            };
+            // TreeView for tables
+            var tablesNode = new TreeViewItem();
+            tablesNode.Header = "Tables";
+            tablesNode.IsExpanded = true;
 
+            // Context menu for tables
+            var mainContextMenu = new ContextMenu();
+
+            // Menu item for context menu
+            var refreshTablesItem = new MenuItem();
+            refreshTablesItem.Header = "Refresh";
+            refreshTablesItem.Click += RefreshTablesItem_Click;
+
+            // Elements relations
+            mainContextMenu.Items.Add(refreshTablesItem);
+            tablesNode.ContextMenu = mainContextMenu;
+            
             foreach (string table in tables)
             {
-                var tableItem = new TreeViewItem
-                {
-                    Header = table
-                };
+                // Tree View for particular table
+                var tableItem = new TreeViewItem();
+                tableItem.Header = table;
 
+                // Context menu for particular table
                 var contextMenu = new ContextMenu();
 
-                var selectMenuItem = new MenuItem
-                {
-                    Header = "Select top 100 rows"
-                };
-                var insertMenuItem = new MenuItem
-                {
-                    Header = "Insert row"
-                };
-                var updateMenuItem = new MenuItem
-                {
-                    Header = "Update top 100 rows"
-                };
+                // Select for particular table
+                var selectMenuItem = new MenuItem();
+                selectMenuItem.Header = "Select top 100 rows";
 
+                // Insert for particular table
+                var insertMenuItem = new MenuItem();
+                insertMenuItem.Header = "Insert row";
+
+                // Update for particular table
+                var updateMenuItem = new MenuItem();
+                updateMenuItem.Header = "Update top 100 rows";
+
+                // Binding Clicks for contect menu
                 selectMenuItem.Click += SelectMenuItem_Click;
                 insertMenuItem.Click += InsertMenuItem_Click;
                 updateMenuItem.Click += UpdateMenuItem_Click;
 
+                // Elements relations
                 contextMenu.Items.Add(selectMenuItem);
                 contextMenu.Items.Add(updateMenuItem);
                 contextMenu.Items.Add(insertMenuItem);
-
                 tableItem.ContextMenu = contextMenu;
-
                 tablesNode.Items.Add(tableItem);
-
             }
 
             ItemsTree.Items.Add(tablesNode);

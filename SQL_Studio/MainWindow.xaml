@@ -9,27 +9,27 @@
 
     <Grid>
 
-        <!-- СТРОКИ -->
+        <!-- Rows -->
         <Grid.RowDefinitions>
 
-            <!-- Верхняя панель -->
+            <!-- Upper block -->
             <RowDefinition Height="50"/>
 
-            <!-- Основная область -->
+            <!-- Main block -->
             <RowDefinition Height="*"/>
 
-            <!-- Результаты -->
+            <!-- Results-->
             <RowDefinition Height="200"/>
 
         </Grid.RowDefinitions>
 
-        <!-- КОЛОНКИ -->
+        <!-- Columns -->
         <Grid.ColumnDefinitions>
 
-            <!-- Левая панель -->
+            <!-- Left -->
             <ColumnDefinition Width="250"/>
 
-            <!-- Правая область -->
+            <!-- Right -->
             <ColumnDefinition Width="*"/>
 
         </Grid.ColumnDefinitions>
@@ -75,12 +75,12 @@
 
         </StackPanel>
 
-        <!-- ЛЕВАЯ ПАНЕЛЬ -->
+        <!-- Left block -->
         <TreeView x:Name="ItemsTree"
           Grid.Row="1"
           Grid.Column="0"
           Margin="10">
-            
+
         </TreeView>
 
         <TextBox 
@@ -89,7 +89,7 @@
               Grid.Column="0"
               Margin="10,18,10,18"/>
 
-        <!-- ТАБЫ С ЗАПРОСАМИ -->
+        <!-- Query tabs -->
         <TabControl 
                 x:Name="QueryTabs"
                 Grid.Row="1"
@@ -98,7 +98,7 @@
 
         </TabControl>
 
-        <!-- РЕЗУЛЬТАТЫ -->
+        <!-- Results -->
 
         <TabControl Grid.Row="2"
             Grid.Column="1"
@@ -108,7 +108,7 @@
 
                 <DataGrid 
                     x:Name="ResultsGrid"
-                    Margin="10"/>
+                    Margin="10,0,10,0" Height="124"/>
 
             </TabItem>
             <TabItem Header="Message">
@@ -120,6 +120,13 @@
             </TabItem>
 
         </TabControl>
+        <!-- Execution timer -->
+        <TextBlock 
+            x:Name="ExecutionTimeBlock" 
+            Margin="373,173,23,11" Grid.Row="2" 
+            Grid.Column="1" 
+            Foreground="#FF972A2A" 
+            Background="#FFBBB3B3"/>
 
     </Grid>
 

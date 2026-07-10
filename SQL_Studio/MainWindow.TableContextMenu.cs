@@ -100,5 +100,13 @@ namespace SQL_Studio
             var selectedTextBox = (TextBox)selectedTab.Content;
             selectedTextBox.Text = query;
         }
+        private async void RefreshTablesItem_Click(object sender, RoutedEventArgs e)
+        {
+            Show_Tables();
+        }
+        private async void PopupListBox_MouseDoubleClick(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

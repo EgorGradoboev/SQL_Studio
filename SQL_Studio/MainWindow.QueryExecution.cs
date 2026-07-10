@@ -5,6 +5,7 @@ using System.Data;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Diagnostics;
 
 namespace SQL_Studio
 {
@@ -24,6 +25,8 @@ namespace SQL_Studio
 
             try
             {
+                Stopwatch executionTimer = new Stopwatch();
+                executionTimer.Start();
                 using var command = new NpgsqlCommand(query, _connection);
 
                 if (query.TrimStart().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
@@ -49,6 +52,8 @@ namespace SQL_Studio
                     MessageTextBlock.Text = $"Command completed successfully. Rows affected: {affectedRows}";
                 }
                 AddQueryToBufer(query);
+                executionTimer.Stop();                
+                ExecutionTimeBlock.Text = $"Execution time: {executionTimer.ElapsedMilliseconds} ms";
             }
             catch (Exception ex)
             {
