@@ -17,13 +17,12 @@ namespace SQL_Studio
                 ORDER BY table_name
                 """;
 
-            var tables = new List<string>();
             await using var command = new NpgsqlCommand(sqlQuery, _connection);
             await using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
-                tables.Add(reader.GetString(0));
+                _tables.Add(reader.GetString(0));
             }
 
             ItemsTree.Items.Clear();
@@ -45,7 +44,7 @@ namespace SQL_Studio
             mainContextMenu.Items.Add(refreshTablesItem);
             tablesNode.ContextMenu = mainContextMenu;
             
-            foreach (string table in tables)
+            foreach (string table in _tables)
             {
                 // Tree View for particular table
                 var tableItem = new TreeViewItem();
@@ -103,6 +102,64 @@ namespace SQL_Studio
                 columns.Add(reader.GetString(0));
             }
             return columns;
+        }
+        private string GetCurrentWord (string text, int carretIndex)
+        {
+            if (string.IsNullOrEmpty(text) || carretIndex == 0)
+                return "";
+
+            int start = carretIndex - 1;
+
+            while (start >= 0)
+            {
+                char c = text[start];
+                if (!char.IsLetterOrDigit(c) && c != '_' && c != '.')
+                {
+                    break;
+                }
+
+                start--;
+            }
+
+            int wordStart = start + 1;
+            int wordLength = carretIndex - wordStart;
+
+            return text.Substring(wordStart, wordLength);
+        }
+        private void ShowAutoComplete(QueryEditorContext context)
+        {
+            if (_isAutocompleteInsert)
+                return;
+            var sqlTextBox = context.SqlTextBox;
+            var popup = context.AutocompletePopup;
+            var listbox = context.AutocompleteListBox;
+
+            string currentWord = GetCurrentWord(sqlTextBox.Text, sqlTextBox.CaretIndex);            
+            if (string.IsNullOrWhiteSpace(currentWord))
+            {
+                popup.IsOpen = false;
+                return;
+            }
+
+            var matches = _tables
+                .Where(t => t.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))
+                .Take(20)
+                .ToList();
+            if (matches.Count == 0)
+            {
+                popup.IsOpen = false;
+                return;
+            }
+
+            listbox.ItemsSource = matches;
+            listbox.SelectedIndex = 0;
+
+            var rect = sqlTextBox.GetRectFromCharacterIndex(sqlTextBox.CaretIndex);
+
+            popup.HorizontalOffset = rect.X;
+            popup.VerticalOffset = rect.Y + rect.Height;
+
+            popup.IsOpen = true;
         }
     }
 }

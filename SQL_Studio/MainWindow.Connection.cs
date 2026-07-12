@@ -31,7 +31,7 @@ namespace SQL_Studio
                 MessageBox.Show($"Failed to connect to {_databaseName} database: {ex.Message}");
             }
 
-            MessageTextBlock.Text = $"Connected to {_databaseName} database";
+            MessageTextBlock.Text = $"Connected to {_databaseName} database";            
         }
 
         private async void Button_Disconnect(object sender, RoutedEventArgs e)

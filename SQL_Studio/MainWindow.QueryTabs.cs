@@ -17,19 +17,20 @@ namespace SQL_Studio
             // Qury tab
             var tab = new TabItem();
             tab.Name = $"Query_{_queryCounter}";
+            tab.Header = $"Query_{_queryCounter}";
 
             // Query textbox
-            var textBox = new TextBox();
-            textBox.AcceptsReturn = true;
-            textBox.Name = $"QueryTextBox_{_queryCounter}";
-            textBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            var sqlTextBox = new TextBox();
+            sqlTextBox.AcceptsReturn = true;
+            sqlTextBox.Name = $"QueryTextBox_{_queryCounter}";
+            sqlTextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 
             // Query popup
             var popup = new Popup();
             popup.Name = "AutoCompletePopup";
             popup.StaysOpen = false;
             popup.AllowsTransparency = false;
-            popup.PlacementTarget = textBox;
+            popup.PlacementTarget = sqlTextBox;
             popup.Placement = PlacementMode.Relative;
 
             // Popup border
@@ -43,25 +44,56 @@ namespace SQL_Studio
 
             // Popup listbox
             var popupListBox = new ListBox();
-            popup.Name = "PopupListBox";
-            popupListBox.MouseDoubleClick += PopupListBox_MouseDoubleClick;
+            popupListBox.Name = "PopupListBox";   
 
             // Elements relations
             popupBorder.Child = popupListBox;
             popup.Child = popupBorder;
-            tab.Content = textBox;
+
+            // Setting fields
+            var context = new QueryEditorContext();
+            context.Tab = tab;
+            context.AutocompleteListBox = popupListBox;
+            context.AutocompletePopup = popup;
+            context.SqlTextBox = sqlTextBox;
+
+            // Properties for elements
+            sqlTextBox.TextChanged += (s, args) =>
+            {
+                ShowAutoComplete(context);
+            };
+
+            sqlTextBox.PreviewKeyDown += (s, args) =>
+            {
+                SqlTextBox_PreviewKeyDown(context, args);
+            };
+
+            popupListBox.MouseDoubleClick += (s, args) =>
+            {
+                InsertSelectedAutocomplete_DoubleClick(context);
+            };
+
+            tab.Content = sqlTextBox;
+
+            _queryEditors[tab] = context;
+
             QueryTabs.Items.Add(tab);
             QueryTabs.SelectedItem = tab;
         }
 
         private void Button_CloseQuery(object sender, RoutedEventArgs e)
         {
-            var selectedTab = (TabItem)QueryTabs.SelectedItem;
-            if (selectedTab is not null)
+            if (QueryTabs.SelectedItem is not TabItem selectedTab)
+                return;
+
+            if (_queryEditors.TryGetValue(selectedTab, out var context))
             {
-                QueryTabs.Items.Remove(selectedTab);
-                _queryCounter--;
+                context.AutocompletePopup.IsOpen = false;
+                _queryEditors.Remove(selectedTab);                
             }
+
+            QueryTabs.Items.Remove(selectedTab);
+            _queryCounter--;
         }
     }
 }

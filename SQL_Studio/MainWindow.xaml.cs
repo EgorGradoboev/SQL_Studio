@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -24,9 +25,19 @@ namespace SQL_Studio
         private string _databaseName;
         private int _queryCounter = 0;  
         private List<string> _queryBufer = new();
+        private bool _isAutocompleteInsert = false;
+        private List<string> _tables = new();
+        private readonly Dictionary<TabItem, QueryEditorContext> _queryEditors = new();
         public MainWindow()
         {
             InitializeComponent();
+        }
+        private class QueryEditorContext
+        {
+            public TabItem Tab { get; set; }
+            public TextBox SqlTextBox { get; set; }
+            public Popup AutocompletePopup { get; set; }
+            public ListBox AutocompleteListBox { get; set; }
         }
     }
 }

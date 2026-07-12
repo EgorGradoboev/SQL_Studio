@@ -5,6 +5,7 @@ using System.Data;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace SQL_Studio
 {
@@ -104,9 +105,68 @@ namespace SQL_Studio
         {
             Show_Tables();
         }
-        private async void PopupListBox_MouseDoubleClick(object sender, RoutedEventArgs e)
+        private void InsertSelectedAutocomplete_DoubleClick(QueryEditorContext context)
         {
+            var sqlTextBox = context.SqlTextBox;
+            var popup = context.AutocompletePopup;
+            var listBox = context.AutocompleteListBox;
 
+            if (listBox.SelectedItem is not string selectedTable)
+                return;
+
+            string currentWord = GetCurrentWord(sqlTextBox.Text, sqlTextBox.CaretIndex);
+
+            if (string.IsNullOrEmpty(currentWord))
+                return;
+
+            int caretIndex = sqlTextBox.CaretIndex;
+            int startIndex = caretIndex - currentWord.Length;
+
+            _isAutocompleteInsert = true;
+
+            sqlTextBox.SelectionStart = startIndex;
+            sqlTextBox.SelectionLength = currentWord.Length;
+            sqlTextBox.SelectedText = selectedTable;
+
+            sqlTextBox.CaretIndex = startIndex + selectedTable.Length;
+
+            _isAutocompleteInsert = false;
+
+            popup.IsOpen = false;
+            sqlTextBox.Focus();
+        }
+        private void SqlTextBox_PreviewKeyDown(QueryEditorContext context, KeyEventArgs e)
+        {
+            var popup = context.AutocompletePopup;
+            var listBox = context.AutocompleteListBox;
+
+            if (!popup.IsOpen)
+                return;
+
+            if (e.Key == Key.Enter || e.Key == Key.Tab)
+            {
+                InsertSelectedAutocomplete_DoubleClick(context);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                popup.IsOpen = false;
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Down)
+            {
+                if (listBox.SelectedIndex < listBox.Items.Count - 1)
+                    listBox.SelectedIndex++;
+
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Up)
+            {
+                if (listBox.SelectedIndex > 0)
+                    listBox.SelectedIndex--;
+
+                e.Handled = true;
+            }
         }
     }
 }
