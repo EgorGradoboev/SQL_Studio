@@ -23,11 +23,16 @@ namespace SQL_Studio
         private NpgsqlConnection? _connection;
         private bool _connected = false;
         private string _databaseName;
+        private string _serverName = "localhost";
         private int _queryCounter = 0;  
         private List<string> _queryBufer = new();
         private bool _isAutocompleteInsert = false;
         private List<string> _tables = new();
+        private List<string> _databases = new();
         private readonly Dictionary<TabItem, QueryEditorContext> _queryEditors = new();
+        private readonly Dictionary<string, TreeViewItem> _databaseNodes = new();
+        private readonly TreeViewItem _serverTreeView = new();
+        private readonly TreeViewItem _databasesTreeView = new();
         public MainWindow()
         {
             InitializeComponent();

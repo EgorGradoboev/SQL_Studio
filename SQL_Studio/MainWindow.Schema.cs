@@ -2,85 +2,186 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace SQL_Studio
 {
     public partial class MainWindow
     {
-        private async Task Show_Tables()
+        private async Task Load_Server()
         {
-            var sqlQuery = """
+            _serverTreeView.Header = _serverName;
+            _serverTreeView.IsExpanded = true;
+            ItemsTree.Items.Add(_serverTreeView);
+        }
+        private async Task Load_Databases()
+        {
+            const string query = """
+                SELECT datname FROM pg_database WHERE datistemplate = false ORDER BY datname
+                """;
+
+            _databases.Clear();
+            {
+                await using var command = new NpgsqlCommand(query, _connection);
+                await using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    _databases.Add(reader.GetString(0));
+                }
+            }
+
+            _serverTreeView.Items.Clear();
+            _databasesTreeView.Items.Clear();
+            _databaseNodes.Clear();
+
+            //TreeView for databases
+            _databasesTreeView.Header = "Databases";
+            _databasesTreeView.IsExpanded = true;
+
+            foreach (string database in _databases)
+            {
+                var databaseItem = new TreeViewItem();
+                databaseItem.Header = database;
+                databaseItem.Tag = database;
+
+                // Placeholder so the node shows an expand arrow before tables are loaded
+                databaseItem.Items.Add(new TreeViewItem { Header = "Loading..." });
+                databaseItem.Expanded += DatabaseItem_Expanded;
+
+                var contextMenu = new ContextMenu();
+                var refreshItem = new MenuItem { Header = "Refresh" };
+                refreshItem.Click += RefreshDatabaseItem_Click;
+                contextMenu.Items.Add(refreshItem);
+                databaseItem.ContextMenu = contextMenu;
+
+                _databaseNodes[database] = databaseItem;
+                _databasesTreeView.Items.Add(databaseItem);
+            }
+
+            _serverTreeView.Items.Add(_databasesTreeView);
+
+            // Eagerly load tables for the database we're actually connected to
+            if (_databaseNodes.TryGetValue(_connection.Database, out var currentDatabaseItem))
+            {
+                await LoadTablesForDatabase(currentDatabaseItem);
+                currentDatabaseItem.IsExpanded = true;
+            }
+        }
+
+        private async void DatabaseItem_Expanded(object sender, RoutedEventArgs e)
+        {
+            // Expanded bubbles up the tree - ignore bubbled events from children
+            if (e.OriginalSource != sender)
+                return;
+
+            var databaseItem = (TreeViewItem)sender;
+            bool notLoadedYet = databaseItem.Items.Count == 1
+                && databaseItem.Items[0] is TreeViewItem placeholder
+                && (string)placeholder.Header == "Loading...";
+
+            if (notLoadedYet)
+            {
+                await LoadTablesForDatabase(databaseItem);
+            }
+        }
+
+        private async Task LoadTablesForDatabase(TreeViewItem databaseItem)
+        {
+            string databaseName = (string)databaseItem.Tag;
+            bool isActiveDatabase = databaseName == _connection.Database;
+
+            // Postgres connections are bound to a single database, so tables of
+            // any other database need their own short-lived connection
+            NpgsqlConnection connection = _connection;
+            NpgsqlConnection? tempConnection = null;
+            if (!isActiveDatabase)
+            {
+                var connectionString = $"Host={_serverName};Port=5432;Database={databaseName};Username=postgres;Password=1234;";
+                tempConnection = new NpgsqlConnection(connectionString);
+                await tempConnection.OpenAsync();
+                connection = tempConnection;
+            }
+
+            const string sqlQuery = """
                 SELECT table_name
                 FROM information_schema.tables
                 WHERE table_schema = 'public'
                 ORDER BY table_name
                 """;
 
-            await using var command = new NpgsqlCommand(sqlQuery, _connection);
-            await using var reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            var tables = new List<string>();
+            try
             {
-                _tables.Add(reader.GetString(0));
+                await using var command = new NpgsqlCommand(sqlQuery, connection);
+                await using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    tables.Add(reader.GetString(0));
+                }
+            }
+            finally
+            {
+                if (tempConnection != null)
+                    await tempConnection.CloseAsync();
             }
 
-            ItemsTree.Items.Clear();
-
-            // TreeView for tables
-            var tablesNode = new TreeViewItem();
-            tablesNode.Header = "Tables";
-            tablesNode.IsExpanded = true;
-
-            // Context menu for tables
-            var mainContextMenu = new ContextMenu();
-
-            // Menu item for context menu
-            var refreshTablesItem = new MenuItem();
-            refreshTablesItem.Header = "Refresh";
-            refreshTablesItem.Click += RefreshTablesItem_Click;
-
-            // Elements relations
-            mainContextMenu.Items.Add(refreshTablesItem);
-            tablesNode.ContextMenu = mainContextMenu;
-            
-            foreach (string table in _tables)
+            databaseItem.Items.Clear();
+            foreach (string table in tables)
             {
-                // Tree View for particular table
-                var tableItem = new TreeViewItem();
-                tableItem.Header = table;
-
-                // Context menu for particular table
-                var contextMenu = new ContextMenu();
-
-                // Select for particular table
-                var selectMenuItem = new MenuItem();
-                selectMenuItem.Header = "Select top 100 rows";
-
-                // Insert for particular table
-                var insertMenuItem = new MenuItem();
-                insertMenuItem.Header = "Insert row";
-
-                // Update for particular table
-                var updateMenuItem = new MenuItem();
-                updateMenuItem.Header = "Update top 100 rows";
-
-                // Binding Clicks for contect menu
-                selectMenuItem.Click += SelectMenuItem_Click;
-                insertMenuItem.Click += InsertMenuItem_Click;
-                updateMenuItem.Click += UpdateMenuItem_Click;
-
-                // Elements relations
-                contextMenu.Items.Add(selectMenuItem);
-                contextMenu.Items.Add(updateMenuItem);
-                contextMenu.Items.Add(insertMenuItem);
-                tableItem.ContextMenu = contextMenu;
-                tablesNode.Items.Add(tableItem);
+                databaseItem.Items.Add(CreateTableTreeViewItem(table, databaseName));
             }
 
-            ItemsTree.Items.Add(tablesNode);
+            if (isActiveDatabase)
+            {
+                _tables = tables;
+            }
         }
 
+        private async Task EnsureConnectedToDatabase(string databaseName)
+        {
+            if (_connection.Database == databaseName)
+                return;
+
+            await _connection.CloseAsync();
+            var connectionString = $"Host={_serverName};Port=5432;Database={databaseName};Username=postgres;Password=1234;";
+            _connection = new NpgsqlConnection(connectionString);
+            await _connection.OpenAsync();
+            _databaseName = databaseName;
+
+            // Keep autocomplete in sync with whichever database is now active
+            if (_databaseNodes.TryGetValue(databaseName, out var databaseItem))
+            {
+                _tables = databaseItem.Items
+                    .Cast<TreeViewItem>()
+                    .Select(item => (string)item.Header)
+                    .ToList();
+            }
+        }
+
+        private TreeViewItem CreateTableTreeViewItem(string table, string databaseName)
+        {
+            var tableItem = new TreeViewItem();
+            tableItem.Header = table;
+            tableItem.Tag = databaseName;
+
+            var contextMenu = new ContextMenu();
+
+            var selectMenuItem = new MenuItem { Header = "Select top 100 rows" };
+            var insertMenuItem = new MenuItem { Header = "Insert row" };
+            var updateMenuItem = new MenuItem { Header = "Update top 100 rows" };
+
+            selectMenuItem.Click += SelectMenuItem_Click;
+            insertMenuItem.Click += InsertMenuItem_Click;
+            updateMenuItem.Click += UpdateMenuItem_Click;
+
+            contextMenu.Items.Add(selectMenuItem);
+            contextMenu.Items.Add(updateMenuItem);
+            contextMenu.Items.Add(insertMenuItem);
+            tableItem.ContextMenu = contextMenu;
+
+            return tableItem;
+        }
         private async Task<List<string>> GetColumnNames(string table)
         {
 

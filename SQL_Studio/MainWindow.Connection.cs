@@ -16,15 +16,15 @@ namespace SQL_Studio
                 return;
             }
             _databaseName = ConnectionTextBox.Text;
-            var connectionString = $"Host=localhost;Port=5432;Database={_databaseName};Username=postgres;Password=1234;";
+            var connectionString = $"Host={_serverName};Port=5432;Database={_databaseName};Username=postgres;Password=1234;";
 
             try
             {
                 _connection = new NpgsqlConnection(connectionString);
                 await _connection.OpenAsync();
-                await Show_Tables();
                 _connected = true;
-
+                await Load_Server();
+                await Load_Databases();
             }
             catch (Exception ex)
             {

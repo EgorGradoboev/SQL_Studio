@@ -41,12 +41,13 @@ namespace SQL_Studio
                 }
                 else
                 {
-                    if (query.TrimStart().StartsWith("CREATE", StringComparison.OrdinalIgnoreCase))
-                    {
-                        await Show_Tables();
-                    }
-
                     var affectedRows = await command.ExecuteNonQueryAsync();
+
+                    if (query.TrimStart().StartsWith("CREATE", StringComparison.OrdinalIgnoreCase)
+                        && _databaseNodes.TryGetValue(_connection.Database, out var currentDatabaseItem))
+                    {
+                        await LoadTablesForDatabase(currentDatabaseItem);
+                    }
 
                     ResultsGrid.ItemsSource = null;
                     MessageTextBlock.Text = $"Command completed successfully. Rows affected: {affectedRows}";

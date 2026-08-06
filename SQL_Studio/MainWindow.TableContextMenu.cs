@@ -32,6 +32,8 @@ namespace SQL_Studio
             var treeItem = (TreeViewItem)contextMenu.PlacementTarget;
             string table = treeItem.Header.ToString();
 
+            await EnsureConnectedToDatabase((string)treeItem.Tag);
+
             var dataTable = await GetTableData(table);
             List<string> columnNames = await GetColumnNames(table);
             string result = string.Join(", ", columnNames);
@@ -60,6 +62,8 @@ namespace SQL_Studio
             var treeItem = (TreeViewItem)contextMenu.PlacementTarget;
             string table = treeItem.Header.ToString();
 
+            await EnsureConnectedToDatabase((string)treeItem.Tag);
+
             var dataTable = await GetTableData(table);
             ResultsGrid.ItemsSource = dataTable.DefaultView;
             MessageTextBlock.Text = $"Rows returned: {dataTable.Rows.Count}";
@@ -83,6 +87,8 @@ namespace SQL_Studio
             var treeItem = (TreeViewItem)contextMenu.PlacementTarget;
             string table = treeItem.Header.ToString();
 
+            await EnsureConnectedToDatabase((string)treeItem.Tag);
+
             var dataTable = await GetTableData(table);
             ResultsGrid.ItemsSource = dataTable.DefaultView;
             MessageTextBlock.Text = $"Rows returned: {dataTable.Rows.Count}";
@@ -101,9 +107,12 @@ namespace SQL_Studio
             var selectedTextBox = (TextBox)selectedTab.Content;
             selectedTextBox.Text = query;
         }
-        private async void RefreshTablesItem_Click(object sender, RoutedEventArgs e)
+        private async void RefreshDatabaseItem_Click(object sender, RoutedEventArgs e)
         {
-            Show_Tables();
+            var menuItem = (MenuItem)sender;
+            var contextMenu = (ContextMenu)menuItem.Parent;
+            var databaseItem = (TreeViewItem)contextMenu.PlacementTarget;
+            await LoadTablesForDatabase(databaseItem);
         }
         private void InsertSelectedAutocomplete_DoubleClick(QueryEditorContext context)
         {
