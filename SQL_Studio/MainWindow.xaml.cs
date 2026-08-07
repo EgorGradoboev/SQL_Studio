@@ -23,7 +23,9 @@ namespace SQL_Studio
         private NpgsqlConnection? _connection;
         private bool _connected = false;
         private string _databaseName;
-        private string _serverName = "localhost";
+        private string _serverName;
+        private string _login;
+        private string _password;
         private int _queryCounter = 0;  
         private List<string> _queryBufer = new();
         private bool _isAutocompleteInsert = false;
@@ -33,8 +35,12 @@ namespace SQL_Studio
         private readonly Dictionary<string, TreeViewItem> _databaseNodes = new();
         private readonly TreeViewItem _serverTreeView = new();
         private readonly TreeViewItem _databasesTreeView = new();
-        public MainWindow()
+        public MainWindow(string login, string password, string serverName, NpgsqlConnection connection)
         {
+            _connection = connection;
+            _serverName = serverName;
+            _login = login;
+            _password = password;
             InitializeComponent();
         }
         private class QueryEditorContext

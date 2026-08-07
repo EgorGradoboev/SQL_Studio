@@ -1,0 +1,80 @@
+﻿<Window x:Class="SQL_Studio.ConnectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SQL_Studio"
+        mc:Ignorable="d"
+        Title="Connect to server"
+        Height="230" Width="320"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="90"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock
+            x:Name="ServerTextBlock"
+            Grid.Row="0" Grid.Column="0"
+            Text="Server name:"
+            VerticalAlignment="Center"
+            Margin="0,0,10,10"/>
+        <TextBox
+            x:Name="ServerConnectionTextBox"
+            Grid.Row="0" Grid.Column="1"
+            Height="26"
+            Margin="0,0,0,10"
+            VerticalContentAlignment="Center"/>
+
+        <TextBlock
+            x:Name="LoginTextBlock"
+            Grid.Row="1" Grid.Column="0"
+            Text="Login:"
+            VerticalAlignment="Center"
+            Margin="0,0,10,10"/>
+        <TextBox
+            x:Name="LoginTextBox"
+            Grid.Row="1" Grid.Column="1"
+            Height="26"
+            Margin="0,0,0,10"
+            VerticalContentAlignment="Center"/>
+
+        <TextBlock
+            x:Name="PasswordTextBlock"
+            Grid.Row="2" Grid.Column="0"
+            Text="Password:"
+            VerticalAlignment="Center"
+            Margin="0,0,10,10"/>
+        <PasswordBox
+            x:Name="PasswordTextBox"
+            Grid.Row="2" Grid.Column="1"
+            Height="26"
+            Margin="0,0,0,10"
+            VerticalContentAlignment="Center"/>
+
+        <StackPanel
+            Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <Button
+                Click="Button_ConnectServer"
+                Content="Connect"
+                Width="90" Height="28"
+                Margin="0,0,10,0"/>
+            <Button
+                Click="Button_CancelConnect"
+                Content="Cancel"
+                Width="90" Height="28"/>
+        </StackPanel>
+    </Grid>
+</Window>
