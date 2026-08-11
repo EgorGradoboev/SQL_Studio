@@ -43,7 +43,7 @@
 
             <Button 
                 Click="Button_ChangeServer"
-                Content="Change server"
+                Content="Connect to server"
                 Width="100"
                 Margin="0,0,10,0"/>
             <Button 
@@ -55,6 +55,11 @@
             <Button 
                 Click="Button_Execute"
                 Content="Execute"
+                Width="100"
+                Margin="0,0,10,0"/>
+            <Button 
+                Click="Button_Cancel"
+                Content="Cancel"
                 Width="100"
                 Margin="0,0,10,0"/>
 

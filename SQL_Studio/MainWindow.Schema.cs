@@ -17,6 +17,9 @@ namespace SQL_Studio
         }
         private async Task Load_Databases()
         {
+            if (_connection is null)
+                return;
+
             const string query = """
                 SELECT datname FROM pg_database WHERE datistemplate = false ORDER BY datname
                 """;
@@ -88,6 +91,9 @@ namespace SQL_Studio
 
         private async Task LoadTablesForDatabase(TreeViewItem databaseItem)
         {
+            if (_connection is null)
+                return;
+
             string databaseName = (string)databaseItem.Tag;
             bool isActiveDatabase = databaseName == _connection.Database;
 
@@ -140,7 +146,7 @@ namespace SQL_Studio
 
         private async Task EnsureConnectedToDatabase(string databaseName)
         {
-            if (_connection.Database == databaseName)
+            if (_connection is null || _connection.Database == databaseName)
                 return;
 
             await _connection.CloseAsync();

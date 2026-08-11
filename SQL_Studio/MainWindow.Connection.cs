@@ -44,19 +44,23 @@ namespace SQL_Studio
 
         private async void Button_Disconnect(object sender, RoutedEventArgs e)
         {
-            //try
-            //{
-            //    await _connection.CloseAsync();
-            //    _connected = false;
-            //    ItemsTree.Items.Clear();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show($"Failed to disconnect from {_databaseName} database: {ex.Message}");
-            //    return;
-            //}
+            try
+            {
+                if (_connection is not null)
+                {
+                    await _connection.CloseAsync();
+                    _connection = null;
+                    _connected = false;
+                    ItemsTree.Items.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to disconnect from {_databaseName} database: {ex.Message}");
+                return;
+            }
 
-            //MessageTextBlock.Text = $"Disconnected from {_databaseName} database";
+            MessageTextBlock.Text = $"Disconnected from {_databaseName} database";
         }
     }
 }
