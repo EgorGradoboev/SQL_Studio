@@ -35,12 +35,8 @@ namespace SQL_Studio
         private readonly Dictionary<string, TreeViewItem> _databaseNodes = new();
         private readonly TreeViewItem _serverTreeView = new();
         private readonly TreeViewItem _databasesTreeView = new();
-        public MainWindow(string login, string password, string serverName, NpgsqlConnection connection)
+        public MainWindow()
         {
-            _connection = connection;
-            _serverName = serverName;
-            _login = login;
-            _password = password;
             InitializeComponent();
         }
         private class QueryEditorContext

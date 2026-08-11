@@ -97,7 +97,7 @@ namespace SQL_Studio
             NpgsqlConnection? tempConnection = null;
             if (!isActiveDatabase)
             {
-                var connectionString = $"Host={_serverName};Port=5432;Database={databaseName};Username=postgres;Password=1234;";
+                var connectionString = $"Host={_serverName};Port=5432;Database={databaseName};Username={_login};Password={_password}";
                 tempConnection = new NpgsqlConnection(connectionString);
                 await tempConnection.OpenAsync();
                 connection = tempConnection;
@@ -144,7 +144,7 @@ namespace SQL_Studio
                 return;
 
             await _connection.CloseAsync();
-            var connectionString = $"Host={_serverName};Port=5432;Database={databaseName};Username=postgres;Password=1234;";
+            var connectionString = $"Host={_serverName};Port=5432;Database={databaseName};Username={_login};Password={_password};";
             _connection = new NpgsqlConnection(connectionString);
             await _connection.OpenAsync();
             _databaseName = databaseName;

@@ -19,6 +19,11 @@ namespace SQL_Studio
                 return;
             }
             var selectedTab = (TabItem)QueryTabs.SelectedItem;
+            if (selectedTab is null)
+            {
+                MessageBox.Show("No one query tab is opened");
+                return;
+            }
             var selectedTextBox = (TextBox)selectedTab.Content;
 
             string query = selectedTextBox.Text;

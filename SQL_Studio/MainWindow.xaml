@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQL_Studio"
         mc:Ignorable="d"
+        Loaded="MainWindow_Loaded"
         Title="MainWindow" Height="450" Width="800">
 
     <Grid>
@@ -41,8 +42,8 @@
                 Margin="10">
 
             <Button 
-                Click="Button_Connect"
-                Content="Connect"
+                Click="Button_ChangeServer"
+                Content="Change server"
                 Width="100"
                 Margin="0,0,10,0"/>
             <Button 

@@ -8,47 +8,55 @@ namespace SQL_Studio
 {
     public partial class MainWindow
     {
-        private async void Button_Connect(object sender, RoutedEventArgs e)
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_connected)
+            ConnectToServer();
+        }
+        private async void Button_ChangeServer(object sender, RoutedEventArgs e)
+        {
+            if (_connection is not null)
             {
-                MessageBox.Show($"Already connected to {_connection.Database} database");
+                await _connection.CloseAsync();
+                _connection = null;
+            }            
+            ItemsTree.Items.Clear();
+            ConnectToServer();
+        }
+
+        private async void ConnectToServer()
+        {
+            var connectionWindow = new ConnectionWindow();
+            connectionWindow.Owner = this;
+            bool? result = connectionWindow.ShowDialog();
+            if (result != true)
+            {
                 return;
             }
-            _databaseName = ConnectionTextBox.Text;
-            var connectionString = $"Host={_serverName};Port=5432;Database={_databaseName};Username=postgres;Password=1234;";
+            _connection = connectionWindow.Connection;
+            _serverName = connectionWindow.ServerName;
+            _login = connectionWindow.Login;
+            _password = connectionWindow.Password;
 
-            try
-            {
-                _connection = new NpgsqlConnection(connectionString);
-                await _connection.OpenAsync();
-                _connected = true;
-                await Load_Server();
-                await Load_Databases();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to connect to {_databaseName} database: {ex.Message}");
-            }
-
-            MessageTextBlock.Text = $"Connected to {_databaseName} database";            
+            _connected = true;
+            await Load_Server();
+            await Load_Databases();
         }
 
         private async void Button_Disconnect(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                await _connection.CloseAsync();
-                _connected = false;
-                ItemsTree.Items.Clear();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to disconnect from {_databaseName} database: {ex.Message}");
-                return;
-            }
+            //try
+            //{
+            //    await _connection.CloseAsync();
+            //    _connected = false;
+            //    ItemsTree.Items.Clear();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show($"Failed to disconnect from {_databaseName} database: {ex.Message}");
+            //    return;
+            //}
 
-            MessageTextBlock.Text = $"Disconnected from {_databaseName} database";
+            //MessageTextBlock.Text = $"Disconnected from {_databaseName} database";
         }
     }
 }

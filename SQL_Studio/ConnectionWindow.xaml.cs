@@ -43,7 +43,7 @@ namespace SQL_Studio
         }
         private async void Button_CancelConnect(object sender, RoutedEventArgs e)
         {
-            return;
+            DialogResult = false;
         }
         public ConnectionWindow()
         {
