@@ -4,95 +4,79 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQL_Studio"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Connect to server"
-        Height="260" Width="320"
+        Height="380" Width="340"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}">
 
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="90"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <ComboBox
-            x:Name="RecentConnectionsComboBox"
-            Grid.Row="0" Grid.Column="1"
-            DisplayMemberPath="DisplayName"
-            SelectionChanged="RecentConnectionsComboBox_SelectionChanged"/>
-        <TextBlock
-            x:Name="ServerTextBlock"
-            Grid.Row="1" Grid.Column="0"
-            Text="Server name:"
-            VerticalAlignment="Center"
-            Margin="0,0,10,10"/>
-        <TextBox
-            x:Name="ServerConnectionTextBox"
-            Grid.Row="1" Grid.Column="1"
-            Height="26"
-            Margin="0,0,0,10"
-            VerticalContentAlignment="Center"/>
+    <materialDesign:Card Margin="16" Padding="20">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <TextBlock
-            x:Name="PortTextBlock"
-            Grid.Row="2" Grid.Column="0"
-            Text="Port:"
-            VerticalAlignment="Center"
-            Margin="0,0,10,10"/>
-        <TextBox
-            x:Name="PortConnectionTextBox"
-            Grid.Row="2" Grid.Column="1"
-            Height="26"
-            Margin="0,0,0,10"
-            VerticalContentAlignment="Center"/>
+            <ComboBox
+                x:Name="RecentConnectionsComboBox"
+                Grid.Row="0"
+                Margin="0,0,0,16"
+                Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                materialDesign:HintAssist.Hint="Recent connections"
+                DisplayMemberPath="DisplayName"
+                SelectionChanged="RecentConnectionsComboBox_SelectionChanged"/>
 
-        <TextBlock
-            x:Name="LoginTextBlock"
-            Grid.Row="3" Grid.Column="0"
-            Text="Login:"
-            VerticalAlignment="Center"
-            Margin="0,0,10,10"/>
-        <TextBox
-            x:Name="LoginTextBox"
-            Grid.Row="3" Grid.Column="1"
-            Height="26"
-            Margin="0,0,0,10"
-            VerticalContentAlignment="Center"/>
+            <TextBox
+                x:Name="ServerConnectionTextBox"
+                Grid.Row="1"
+                Margin="0,0,0,16"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                materialDesign:HintAssist.Hint="Server name"/>
 
-        <TextBlock
-            x:Name="PasswordTextBlock"
-            Grid.Row="4" Grid.Column="0"
-            Text="Password:"
-            VerticalAlignment="Center"
-            Margin="0,0,10,10"/>
-        <PasswordBox
-            x:Name="PasswordTextBox"
-            Grid.Row="4" Grid.Column="1"
-            Height="26"
-            Margin="0,0,0,10"
-            VerticalContentAlignment="Center"/>
+            <TextBox
+                x:Name="PortConnectionTextBox"
+                Grid.Row="2"
+                Margin="0,0,0,16"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                materialDesign:HintAssist.Hint="Port"/>
 
-        <StackPanel
-            Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-            <Button
-                Click="Button_ConnectServer"
-                Content="Connect"
-                Width="90" Height="28"
-                Margin="0,0,10,0"/>
-            <Button
-                Click="Button_CancelConnect"
-                Content="Cancel"
-                Width="90" Height="28"/>
-        </StackPanel>
-    </Grid>
+            <TextBox
+                x:Name="LoginTextBox"
+                Grid.Row="3"
+                Margin="0,0,0,16"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                materialDesign:HintAssist.Hint="Login"/>
+
+            <PasswordBox
+                x:Name="PasswordTextBox"
+                Grid.Row="4"
+                Margin="0,0,0,16"
+                Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+                materialDesign:HintAssist.Hint="Password"/>
+
+            <StackPanel
+                Grid.Row="6"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+                <Button
+                    Click="Button_CancelConnect"
+                    Content="CANCEL"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Margin="0,0,8,0"/>
+                <Button
+                    Click="Button_ConnectServer"
+                    Content="CONNECT"
+                    Style="{StaticResource MaterialDesignRaisedButton}"/>
+            </StackPanel>
+        </Grid>
+    </materialDesign:Card>
 </Window>
