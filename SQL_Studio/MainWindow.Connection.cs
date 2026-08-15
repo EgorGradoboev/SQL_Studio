@@ -28,15 +28,15 @@ namespace SQL_Studio
             var connectionWindow = new ConnectionWindow();
             connectionWindow.Owner = this;
             bool? result = connectionWindow.ShowDialog();
-            if (result != true)
-            {
-                return;
-            }
             _connection = connectionWindow.Connection;
             _serverName = connectionWindow.ServerName;
             _login = connectionWindow.Login;
             _password = connectionWindow.Password;
-
+            _port = connectionWindow.Port;
+            if (result != true)
+            {
+                return;
+            }
             _connected = true;
             await Load_Server();
             await Load_Databases();

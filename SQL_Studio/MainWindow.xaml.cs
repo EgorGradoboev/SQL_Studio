@@ -28,6 +28,7 @@ namespace SQL_Studio
         private string _serverName;
         private string _login;
         private string _password;
+        private string _port;
         private int _queryCounter = 0;  
         private List<string> _queryBufer = new();
         private bool _isAutocompleteInsert = false;
@@ -48,5 +49,6 @@ namespace SQL_Studio
             public Popup AutocompletePopup { get; set; }
             public ListBox AutocompleteListBox { get; set; }
         }
+        
     }
 }

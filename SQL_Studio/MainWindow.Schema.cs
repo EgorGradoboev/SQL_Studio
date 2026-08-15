@@ -103,7 +103,7 @@ namespace SQL_Studio
             NpgsqlConnection? tempConnection = null;
             if (!isActiveDatabase)
             {
-                var connectionString = $"Host={_serverName};Port=5432;Database={databaseName};Username={_login};Password={_password}";
+                var connectionString = $"Host={_serverName};Port={_port};Database={databaseName};Username={_login};Password={_password}";
                 tempConnection = new NpgsqlConnection(connectionString);
                 await tempConnection.OpenAsync();
                 connection = tempConnection;

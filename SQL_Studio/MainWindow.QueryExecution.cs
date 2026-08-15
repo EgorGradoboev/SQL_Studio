@@ -32,7 +32,7 @@ namespace SQL_Studio
             var selectedTextBox = (TextBox)selectedTab.Content;
             _isExecuting = true;
             string query = selectedTextBox.Text;
-
+            ExecutionTimeBlock.Text = "Executing...";
             try
             {
                 Stopwatch executionTimer = new Stopwatch();
