@@ -1,4 +1,6 @@
 ﻿using Npgsql;
+using SQL_Studio.Services;
+using SQL_Studio.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -38,6 +40,7 @@ namespace SQL_Studio
                 return;
             }
             _connected = true;
+            DataContext = new MainViewModel(_connection);
             await Load_Server();
             await Load_Databases();
         }

@@ -1,4 +1,6 @@
 ﻿using Npgsql;
+using SQL_Studio.Services;
+using SQL_Studio.ViewModels;
 using System.Collections;
 using System.Data;
 using System.Reflection.Emit;
@@ -41,6 +43,7 @@ namespace SQL_Studio
         public MainWindow()
         {
             InitializeComponent();
+            
         }
         private class QueryEditorContext
         {

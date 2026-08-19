@@ -61,26 +61,26 @@
                 <Separator Style="{StaticResource MaterialDesignSeparator}" Margin="4,4"/>
 
                 <Button
-                    Click="Button_Execute"
                     Content="EXECUTE"
+                    Command="{Binding QueryTabs.SelectedTab.ExecuteCommand}"
                     Style="{StaticResource MaterialDesignRaisedButton}"
                     Margin="4,0,4,0"/>
                 <Button
-                    Click="Button_Cancel"
                     Content="CANCEL"
+                    Command="{Binding QueryTabs.SelectedTab.CancelCommand}"
                     Style="{StaticResource MaterialDesignOutlinedButton}"
                     Margin="0,0,4,0"/>
 
                 <Separator Style="{StaticResource MaterialDesignSeparator}" Margin="4,4"/>
 
-                <Button
-                    Click="Button_NewQuery"
+                <Button                    
                     Content="NEW QUERY"
+                    Command="{Binding QueryTabs.NewTabCommand}"
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="0,0,4,0"/>
                 <Button
-                    Click="Button_CloseQuery"
                     Content="CLOSE QUERY"
+                    Command="{Binding QueryTabs.CloseTabCommand}"
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="0,0,4,0"/>
                 <Button
@@ -106,6 +106,9 @@
                 Margin="0,0,0,12">
             <TabControl
                     x:Name="QueryTabs"
+                    ItemsSource="{Binding QueryTabs.Tabs}"
+                    SelectedItem="{Binding QueryTabs.SelectedTab}"
+                    ItemTemplate="{StaticResource QueryTabHeaderTemplate}"
                     materialDesign:ColorZoneAssist.Mode="PrimaryLight"/>
         </materialDesign:Card>
 
@@ -125,14 +128,15 @@
 
                         <DataGrid
                             x:Name="ResultsGrid"
+                            ItemsSource="{Binding QueryTabs.SelectedTab.QueryResults}"
                             Margin="4"/>
 
                     </TabItem>
                     <TabItem Header="Message">
 
-                        <TextBox
+                        <TextBlock
                             x:Name="MessageTextBlock"
-                            BorderThickness="0"
+                            Text="{Binding QueryTabs.SelectedTab.StatusMessage}"
                             Margin="8"/>
 
                     </TabItem>
