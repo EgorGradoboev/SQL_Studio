@@ -9,16 +9,25 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm;
 using CommunityToolkit.Mvvm.Input;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace SQL_Studio.ViewModels
 {
     public class QueryViewModel : INotifyPropertyChanged
     {
         private readonly QueryExecutionService _executionService;
-        private readonly NpgsqlConnection _connection;
+        private NpgsqlConnection? _connection;
         private CancellationTokenSource? _executionCts;
+        private ConnectionFactoryService _connectionFactory;
 
         public string QueryText { get; set; } = "";
+        private string _executionTimerText;
+        private string _databaseName;
+        public string ExecutionTimerText
+        {
+            get => _executionTimerText;
+            set { _executionTimerText = value; OnpropertyChanged(); }
+        }
         public string TabName { get; set; }
         private DataView? _queryResults;
         public DataView? QueryResults
@@ -35,21 +44,36 @@ namespace SQL_Studio.ViewModels
         }
         public ICommand ExecuteCommand { get; }
         public ICommand CancelCommand { get; }
-        public QueryViewModel(NpgsqlConnection connection, QueryExecutionService executionService, int counter)
+        public QueryViewModel(QueryExecutionService executionService, 
+            ConnectionFactoryService connectionFactory, string databaseName,
+            int counter)
         {
+            _databaseName = databaseName;
+            _connectionFactory = connectionFactory;
             _executionService = executionService;
-            _connection = connection;
-            TabName = $"Query {counter}";
+            TabName = $"Query {counter}";            
             ExecuteCommand = new RelayCommand(async () => await ExecuteAsync());
             CancelCommand = new RelayCommand(async () => _executionCts?.Cancel());
+        }
+        private async Task<NpgsqlConnection> GetConnectionAsync()
+        {
+            if (_connection is null)
+            {
+                _connection = await _connectionFactory.OpenConnectionAsync(_databaseName);
+            }
+            return _connection;
         }
 
         private async Task ExecuteAsync()
         {
+            ExecutionTimerText = "Executing...";
             _executionCts = new CancellationTokenSource();
+            Stopwatch executionTimer = new Stopwatch();
+            executionTimer.Start();
             try
             {
-                var result = await _executionService.ExecuteAsync(_connection, QueryText, _executionCts.Token);
+                var connection = await GetConnectionAsync();
+                var result = await _executionService.ExecuteAsync(connection, QueryText, _executionCts.Token);
                 QueryResults = result.IsSelect ? result.ResultsView : null;
                 StatusMessage = result.IsSelect
                     ? $"Rows returned: {result.ResultsView!.Count}"
@@ -67,6 +91,8 @@ namespace SQL_Studio.ViewModels
             {
                 _executionCts.Dispose();
                 _executionCts = null;
+                executionTimer.Stop();
+                ExecutionTimerText = $"Execution time: {executionTimer.ElapsedMilliseconds}";
             }            
         }
         public event PropertyChangedEventHandler? PropertyChanged;

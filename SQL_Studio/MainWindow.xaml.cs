@@ -23,15 +23,11 @@ namespace SQL_Studio
     public partial class MainWindow : Window
     {
         private NpgsqlConnection? _connection;
-        private CancellationTokenSource? _executionCts;
-        private bool _connected = false;
-        private bool _isExecuting = false;
         private string _databaseName;
         private string _serverName;
         private string _login;
         private string _password;
         private string _port;
-        private int _queryCounter = 0;  
         private List<string> _queryBufer = new();
         private bool _isAutocompleteInsert = false;
         private List<string> _tables = new();

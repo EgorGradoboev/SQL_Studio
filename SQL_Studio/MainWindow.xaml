@@ -84,7 +84,6 @@
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="0,0,4,0"/>
                 <Button
-                    Click="Button_HistoryQuery"
                     Content="SHOW HISTORY"
                     Style="{StaticResource MaterialDesignFlatButton}"/>
 
@@ -146,6 +145,7 @@
                 <!-- Execution timer -->
                 <TextBlock
                     x:Name="ExecutionTimeBlock"
+                    Text="{Binding QueryTabs.SelectedTab.ExecutionTimerText}"
                     Grid.Row="1"
                     Margin="8,4,8,8"
                     HorizontalAlignment="Right"

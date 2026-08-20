@@ -32,7 +32,7 @@ namespace SQL_Studio
         public string Port { get; set; }
         public string FilePath { get; set; }
         public List<RecentConnection> RecentConnections { get; set; }
-        public NpgsqlConnection? Connection { get; private set; }
+        private NpgsqlConnection? _connection;
         private void RecentConnectionsComboBox_SelectionChanged (object sender, RoutedEventArgs e)
         {
             if (RecentConnectionsComboBox.SelectedItem is not RecentConnection selected)
@@ -62,8 +62,8 @@ namespace SQL_Studio
 
             try
             {
-                Connection = new NpgsqlConnection(connectionString);
-                await Connection.OpenAsync();                             
+                _connection = new NpgsqlConnection(connectionString);
+                await _connection.OpenAsync();                             
                 
 
                 RecentConnection item = new RecentConnection();
@@ -94,6 +94,14 @@ namespace SQL_Studio
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to connect to {ServerName} server: {ex.Message}");
+            }
+            finally
+            {
+                if (_connection != null)
+                {
+                    await _connection.CloseAsync();
+                    _connection.Dispose();
+                }                
             }
         }
         private async void Button_CancelConnect(object sender, RoutedEventArgs e)

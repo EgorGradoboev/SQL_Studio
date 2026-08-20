@@ -41,7 +41,7 @@ namespace SQL_Studio
             ResultsGrid.ItemsSource = dataTable.DefaultView;
             MessageTextBlock.Text = $"Rows returned: {dataTable.Rows.Count}";
 
-            Button_NewQuery(sender, e);
+            //Button_NewQuery(sender, e);
 
             var selectedTab = (TabItem)QueryTabs.SelectedItem;
             var selectedTextBox = (TextBox)selectedTab.Content;
@@ -74,7 +74,7 @@ namespace SQL_Studio
                 SET *column* = ''
                 WHERE ;
                 """;
-            Button_NewQuery(sender, e);
+            //Button_NewQuery(sender, e);
             var selectedTab = (TabItem)QueryTabs.SelectedItem;
             var selectedTextBox = (TextBox)selectedTab.Content;
             selectedTextBox.Text = query;
@@ -101,7 +101,7 @@ namespace SQL_Studio
                 INSERT INTO {table}({result})
                 VALUES()
                 """;
-            Button_NewQuery(sender, e);
+            //Button_NewQuery(sender, e);
 
             var selectedTab = (TabItem)QueryTabs.SelectedItem;
             var selectedTextBox = (TextBox)selectedTab.Content;

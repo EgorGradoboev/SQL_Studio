@@ -9,10 +9,14 @@ namespace SQL_Studio.ViewModels
     public class MainViewModel
     {
         public QueryTabViewModel QueryTabs { get; }
-        public MainViewModel(NpgsqlConnection connection)
+        private ConnectionFactoryService _connectionFactory;
+        private string _databaseName;
+        public MainViewModel(ConnectionFactoryService connectionFactory, string databaseName)
         {
+            _connectionFactory = connectionFactory;
+            _databaseName = databaseName;
             var executionService = new QueryExecutionService();
-            QueryTabs = new QueryTabViewModel(connection, executionService);
+            QueryTabs = new QueryTabViewModel(_connectionFactory, executionService, _databaseName);
         }
     }
 }

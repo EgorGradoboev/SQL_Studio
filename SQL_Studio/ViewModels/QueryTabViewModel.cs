@@ -21,23 +21,27 @@ namespace SQL_Studio.ViewModels
             get => _selectedTab;
             set { _selectedTab = value; OnpropertyChanged(); }
         }
-        private int counter = 0;
+        private int _counter = 0;
         public ICommand NewTabCommand { get; set; }
         public ICommand CloseTabCommand { get; set; }
         private readonly QueryExecutionService _executionService;
-        private readonly NpgsqlConnection _connection;
-        public QueryTabViewModel(NpgsqlConnection connection, QueryExecutionService executionService)
+        private readonly ConnectionFactoryService _connectionFactory;
+        private readonly string _databaseName;
+        public QueryTabViewModel(ConnectionFactoryService connectionFactory, 
+            QueryExecutionService executionService, string databaseName)
         {
-            _connection = connection;
+            _connectionFactory = connectionFactory;
             _executionService = executionService;
+            _databaseName = databaseName;
             NewTabCommand = new RelayCommand(NewTab);
             CloseTabCommand = new RelayCommand(CloseTab);
         }
 
         private void NewTab()
         {
-            counter++;
-            var tab = new QueryViewModel(_connection, _executionService, counter);
+            _counter++;
+            var tab = new QueryViewModel(_executionService, _connectionFactory, 
+                _databaseName, _counter);
             Tabs.Add(tab);
             SelectedTab = tab;
         }
@@ -47,7 +51,7 @@ namespace SQL_Studio.ViewModels
             {
                 return;
             }
-            counter--;
+            _counter--;
             Tabs.Remove(SelectedTab);
         }
         public event PropertyChangedEventHandler? PropertyChanged;

@@ -30,17 +30,20 @@ namespace SQL_Studio
             var connectionWindow = new ConnectionWindow();
             connectionWindow.Owner = this;
             bool? result = connectionWindow.ShowDialog();
-            _connection = connectionWindow.Connection;
-            _serverName = connectionWindow.ServerName;
-            _login = connectionWindow.Login;
-            _password = connectionWindow.Password;
-            _port = connectionWindow.Port;
             if (result != true)
             {
                 return;
             }
+            _serverName = connectionWindow.ServerName;
+            _login = connectionWindow.Login;
+            _password = connectionWindow.Password;
+            _port = connectionWindow.Port;
+            _databaseName = "postgres";
+            ConnectionFactoryService connectionFactory =
+                new ConnectionFactoryService(_serverName, _port, _login, _password);
+            
             _connected = true;
-            DataContext = new MainViewModel(_connection);
+            DataContext = new MainViewModel(connectionFactory, _databaseName);
             await Load_Server();
             await Load_Databases();
         }
