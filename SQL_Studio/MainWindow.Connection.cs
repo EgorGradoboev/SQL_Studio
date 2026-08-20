@@ -42,10 +42,12 @@ namespace SQL_Studio
             ConnectionFactoryService connectionFactory =
                 new ConnectionFactoryService(_serverName, _port, _login, _password);
             
-            _connected = true;
-            DataContext = new MainViewModel(connectionFactory, _databaseName);
-            await Load_Server();
-            await Load_Databases();
+            var mainViewModel = new MainViewModel(connectionFactory, _databaseName);
+            DataContext = mainViewModel;
+            foreach (var server in mainViewModel.Servers)
+            {
+                await server.LoadDatabasesAsync();
+            }
         }
 
         private async void Button_Disconnect(object sender, RoutedEventArgs e)
@@ -56,7 +58,6 @@ namespace SQL_Studio
                 {
                     await _connection.CloseAsync();
                     _connection = null;
-                    _connected = false;
                     ItemsTree.Items.Clear();
                 }
             }

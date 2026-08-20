@@ -96,7 +96,15 @@
                 Grid.Column="0"
                 Margin="0,0,12,0"
                 Padding="4">
-            <TreeView x:Name="ItemsTree"/>
+            <TreeView x:Name="ItemsTree"
+                      ItemsSource="{Binding Servers}">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+            </TreeView>
+
         </materialDesign:Card>
 
         <!-- Query tabs -->

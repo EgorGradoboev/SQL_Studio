@@ -1,0 +1,18 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:SQL_Studio.ViewModels">
+
+    <HierarchicalDataTemplate DataType="{x:Type vm:ServerViewModel}" ItemsSource="{Binding Databases}">
+        <TextBlock Text="{Binding ServerName}"/>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type vm:DatabaseViewModel}" ItemsSource="{Binding Tables}">
+        <TextBlock Text="{Binding DatabaseName}"/>
+    </HierarchicalDataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:TableViewModel}">
+        <TextBlock Text="{Binding TableName}"/>
+    </DataTemplate>
+
+</ResourceDictionary>
