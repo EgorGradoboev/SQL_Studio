@@ -13,7 +13,9 @@ namespace SQL_Studio.ViewModels
     public class DatabaseViewModel : INotifyPropertyChanged
     {
         public string DatabaseName { get; }
+        private int _limitRows = 100;
         private NpgsqlConnection _connection;
+        private readonly QueryTabViewModel _queryTabs;
         private readonly ConnectionFactoryService _connectionFactory;
         public ObservableCollection<TableViewModel> Tables { get; } = new();
         private bool _tablesLoaded;
@@ -32,11 +34,12 @@ namespace SQL_Studio.ViewModels
                 }
             }
         }
-        public DatabaseViewModel(string databaseName,
+        public DatabaseViewModel(string databaseName, QueryTabViewModel queryTabs,
             ConnectionFactoryService connectionFactory)
         {
             DatabaseName = databaseName;
             _connectionFactory = connectionFactory;
+            _queryTabs = queryTabs;
         }
         public async Task LoadTablesAsync()
         {
@@ -54,7 +57,8 @@ namespace SQL_Studio.ViewModels
                 Tables.Clear();
                 while (await reader.ReadAsync())
                 {
-                    Tables.Add(new TableViewModel(reader.GetString(0), DatabaseName));
+                    Tables.Add(new TableViewModel(reader.GetString(0), DatabaseName, 
+                        _limitRows, _queryTabs, _connectionFactory));
                 }
             }
             catch (Exception e)

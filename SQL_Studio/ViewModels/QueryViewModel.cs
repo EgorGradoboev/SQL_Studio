@@ -20,7 +20,12 @@ namespace SQL_Studio.ViewModels
         private CancellationTokenSource? _executionCts;
         private ConnectionFactoryService _connectionFactory;
 
-        public string QueryText { get; set; } = "";
+        private string _queryText = "";
+        public string QueryText
+        {
+            get => _queryText;
+            set { _queryText = value; OnpropertyChanged(); }
+        }
         private string _executionTimerText;
         private string _databaseName;
         public string ExecutionTimerText
@@ -64,7 +69,7 @@ namespace SQL_Studio.ViewModels
             return _connection;
         }
 
-        private async Task ExecuteAsync()
+        public async Task ExecuteAsync()
         {
             ExecutionTimerText = "Executing...";
             _executionCts = new CancellationTokenSource();

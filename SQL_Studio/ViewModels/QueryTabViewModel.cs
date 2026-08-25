@@ -33,17 +33,17 @@ namespace SQL_Studio.ViewModels
             _connectionFactory = connectionFactory;
             _executionService = executionService;
             _databaseName = databaseName;
-            NewTabCommand = new RelayCommand(NewTab);
+            NewTabCommand = new RelayCommand(() => NewTab());
             CloseTabCommand = new RelayCommand(CloseTab);
         }
-
-        private void NewTab()
+        public QueryViewModel NewTab()
         {
             _counter++;
             var tab = new QueryViewModel(_executionService, _connectionFactory, 
                 _databaseName, _counter);
             Tabs.Add(tab);
             SelectedTab = tab;
+            return tab;
         }
         private void CloseTab()
         {

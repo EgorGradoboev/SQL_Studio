@@ -12,7 +12,28 @@
     </HierarchicalDataTemplate>
 
     <DataTemplate DataType="{x:Type vm:TableViewModel}">
-        <TextBlock Text="{Binding TableName}"/>
+        <TextBlock Text="{Binding TableName}">
+            <TextBlock.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        Header="Select top 100 rows"
+                        Command="{Binding PlacementTarget.DataContext.Select, 
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                    <MenuItem
+                        Header="Update rows"
+                        Command="{Binding PlacementTarget.DataContext.Update, 
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                    <MenuItem
+                        Header="Insert rows"
+                        Command="{Binding PlacementTarget.DataContext.Insert, 
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                    <MenuItem
+                        Header="Delete rows"
+                        Command="{Binding PlacementTarget.DataContext.Delete, 
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                </ContextMenu>
+            </TextBlock.ContextMenu>
+        </TextBlock>
     </DataTemplate>
 
 </ResourceDictionary>

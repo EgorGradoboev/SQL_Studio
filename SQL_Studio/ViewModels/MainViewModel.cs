@@ -19,7 +19,7 @@ namespace SQL_Studio.ViewModels
             _databaseName = databaseName;
             var executionService = new QueryExecutionService();
             QueryTabs = new QueryTabViewModel(_connectionFactory, executionService, _databaseName);
-            Servers.Add(new ServerViewModel(_databaseName, _connectionFactory));
+            Servers.Add(new ServerViewModel(_databaseName, QueryTabs, _connectionFactory));
         }
     }
 }

@@ -69,6 +69,7 @@
                     Content="CANCEL"
                     Command="{Binding QueryTabs.SelectedTab.CancelCommand}"
                     Style="{StaticResource MaterialDesignOutlinedButton}"
+                    ContextMenu="{Binding ...}"
                     Margin="0,0,4,0"/>
 
                 <Separator Style="{StaticResource MaterialDesignSeparator}" Margin="4,4"/>

@@ -11,13 +11,16 @@ namespace SQL_Studio.ViewModels
     public class ServerViewModel
     {
         public string ServerName { get; set; }
+        private readonly QueryTabViewModel _queryTabs;
         private readonly ConnectionFactoryService _connectionFactory;
         private NpgsqlConnection _connection;
         public ObservableCollection<DatabaseViewModel> Databases { get; } = new();
-        public ServerViewModel(string serverName, ConnectionFactoryService connectionFactory)
-        {
+        public ServerViewModel(string serverName, QueryTabViewModel queryTabs,
+            ConnectionFactoryService connectionFactory)
+        {            
             ServerName = serverName;
             _connectionFactory = connectionFactory;
+            _queryTabs = queryTabs;
         }
         public async Task LoadDatabasesAsync()
         {
@@ -32,7 +35,8 @@ namespace SQL_Studio.ViewModels
                 Databases.Clear();
                 while (await reader.ReadAsync())
                 {
-                    Databases.Add(new DatabaseViewModel(reader.GetString(0), _connectionFactory));
+                    Databases.Add(new DatabaseViewModel(reader.GetString(0),
+                        _queryTabs, _connectionFactory));
                 }
             }
             catch (Exception e)
