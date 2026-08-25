@@ -8,7 +8,16 @@
     </HierarchicalDataTemplate>
 
     <HierarchicalDataTemplate DataType="{x:Type vm:DatabaseViewModel}" ItemsSource="{Binding Tables}">
-        <TextBlock Text="{Binding DatabaseName}"/>
+        <TextBlock Text="{Binding DatabaseName}">
+            <TextBlock.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        Header="Refresh"
+                        Command="{Binding PlacementTarget.DataContext.Refresh,
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                </ContextMenu>
+            </TextBlock.ContextMenu>
+        </TextBlock>
     </HierarchicalDataTemplate>
 
     <DataTemplate DataType="{x:Type vm:TableViewModel}">

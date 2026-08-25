@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQL_Studio"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:SQL_Studio.ViewModels"
         mc:Ignorable="d"
         Loaded="MainWindow_Loaded"
         Title="SQL Studio" Height="650" Width="1000"
@@ -12,6 +13,42 @@
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontSize="13"
         Background="{DynamicResource MaterialDesignPaper}">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:QueryViewModel}">
+            <Grid>
+                <TextBox
+                    x:Name="QueryTextBox"
+                    Text="{Binding QueryText, UpdateSourceTrigger=PropertyChanged}"
+                    TextChanged="QueryTextBox_TextChanged"
+                    PreviewKeyDown="QueryTextBox_PreviewKeyDown"
+                    AcceptsReturn="True"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"/>
+                <Popup
+                    x:Name="AutoCompletePopup"
+                    IsOpen="{Binding IsAutoCompleteOpen}"
+                    PlacementTarget="{Binding ElementName=QueryTextBox}"
+                    Placement="Relative"
+                    StaysOpen="False"
+                    AllowsTransparency="True">
+                    <materialDesign:Card
+                        Background="{DynamicResource MaterialDesignPaper}"
+                        UniformCornerRadius="4"
+                        Padding="0"
+                        MinWidth="220"
+                        MaxHeight="220">
+                        <ListBox
+                            x:Name="SuggestionsListBox"
+                            ItemsSource="{Binding Suggestions}"
+                            BorderThickness="0"
+                            Background="Transparent"/>
+                    </materialDesign:Card>
+                </Popup>
+            </Grid>            
+        </DataTemplate>
+        
+    </Window.Resources>
 
     <Grid Margin="12">
 
@@ -69,7 +106,6 @@
                     Content="CANCEL"
                     Command="{Binding QueryTabs.SelectedTab.CancelCommand}"
                     Style="{StaticResource MaterialDesignOutlinedButton}"
-                    ContextMenu="{Binding ...}"
                     Margin="0,0,4,0"/>
 
                 <Separator Style="{StaticResource MaterialDesignSeparator}" Margin="4,4"/>

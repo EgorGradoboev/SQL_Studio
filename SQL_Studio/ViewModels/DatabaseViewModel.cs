@@ -1,4 +1,5 @@
-﻿using Npgsql;
+﻿using CommunityToolkit.Mvvm.Input;
+using Npgsql;
 using SQL_Studio.Services;
 using System;
 using System.Collections.Generic;
@@ -7,12 +8,14 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Input;
 
 namespace SQL_Studio.ViewModels
 {
     public class DatabaseViewModel : INotifyPropertyChanged
     {
         public string DatabaseName { get; }
+        public ICommand Refresh { get; }
         private int _limitRows = 100;
         private NpgsqlConnection _connection;
         private readonly QueryTabViewModel _queryTabs;
@@ -40,6 +43,12 @@ namespace SQL_Studio.ViewModels
             DatabaseName = databaseName;
             _connectionFactory = connectionFactory;
             _queryTabs = queryTabs;
+            Refresh = new RelayCommand(RefreshTables);
+        }
+        public async void RefreshTables()
+        {
+            Tables.Clear();
+            await LoadTablesAsync();
         }
         public async Task LoadTablesAsync()
         {
