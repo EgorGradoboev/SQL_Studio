@@ -89,11 +89,6 @@
                     Content="CONNECT TO SERVER"
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="0,0,4,0"/>
-                <Button
-                    Click="Button_Disconnect"
-                    Content="DISCONNECT"
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    Margin="0,0,4,0"/>
 
                 <Separator Style="{StaticResource MaterialDesignSeparator}" Margin="4,4"/>
 

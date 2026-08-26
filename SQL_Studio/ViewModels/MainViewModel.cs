@@ -21,5 +21,9 @@ namespace SQL_Studio.ViewModels
             QueryTabs = new QueryTabViewModel(_connectionFactory, executionService, _databaseName);
             Servers.Add(new ServerViewModel(_databaseName, QueryTabs, _connectionFactory));
         }
+        public void AddNewServer(ConnectionFactoryService connectionFactory, string databaseName)
+        {
+            Servers.Add(new ServerViewModel(databaseName, QueryTabs, connectionFactory));
+        }
     }
 }
