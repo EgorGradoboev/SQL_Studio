@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SQL_Studio"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:SQL_Studio.ViewModels"
         mc:Ignorable="d"
         Loaded="MainWindow_Loaded"
         Title="SQL Studio" Height="650" Width="1000"
@@ -12,6 +13,43 @@
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontSize="13"
         Background="{DynamicResource MaterialDesignPaper}">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:QueryViewModel}">
+            <Grid>
+                <TextBox
+                    x:Name="QueryTextBox"
+                    Text="{Binding QueryText, UpdateSourceTrigger=PropertyChanged}"
+                    TextChanged="QueryTextBox_TextChanged"
+                    PreviewKeyDown="QueryTextBox_PreviewKeyDown"
+                    AcceptsReturn="True"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"/>
+                <Popup
+                    x:Name="AutoCompletePopup"
+                    IsOpen="{Binding IsAutoCompleteOpen}"
+                    PlacementTarget="{Binding ElementName=QueryTextBox}"
+                    Placement="Relative"
+                    StaysOpen="False"
+                    AllowsTransparency="True">
+                    <materialDesign:Card
+                        Background="{DynamicResource MaterialDesignPaper}"
+                        UniformCornerRadius="4"
+                        Padding="0"
+                        MinWidth="220"
+                        MaxHeight="220">
+                        <ListBox
+                            x:Name="SuggestionsListBox"
+                            ItemsSource="{Binding Suggestions}"
+                            SelectedItem="{Binding SelectedSuggestion, Mode=TwoWay}"
+                            BorderThickness="0"
+                            Background="Transparent"/>
+                    </materialDesign:Card>
+                </Popup>
+            </Grid>
+        </DataTemplate>
+
+    </Window.Resources>
 
     <Grid Margin="12">
 
@@ -52,41 +90,36 @@
                     Content="CONNECT TO SERVER"
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="0,0,4,0"/>
-                <Button
-                    Click="Button_Disconnect"
-                    Content="DISCONNECT"
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    Margin="0,0,4,0"/>
 
                 <Separator Style="{StaticResource MaterialDesignSeparator}" Margin="4,4"/>
 
                 <Button
-                    Click="Button_Execute"
                     Content="EXECUTE"
+                    Command="{Binding QueryTabs.SelectedTab.ExecuteCommand}"
                     Style="{StaticResource MaterialDesignRaisedButton}"
                     Margin="4,0,4,0"/>
                 <Button
-                    Click="Button_Cancel"
                     Content="CANCEL"
+                    Command="{Binding QueryTabs.SelectedTab.CancelCommand}"
                     Style="{StaticResource MaterialDesignOutlinedButton}"
                     Margin="0,0,4,0"/>
 
                 <Separator Style="{StaticResource MaterialDesignSeparator}" Margin="4,4"/>
 
-                <Button
-                    Click="Button_NewQuery"
+                <Button                    
                     Content="NEW QUERY"
+                    Command="{Binding QueryTabs.NewTabCommand}"
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="0,0,4,0"/>
                 <Button
-                    Click="Button_CloseQuery"
                     Content="CLOSE QUERY"
+                    Command="{Binding QueryTabs.CloseTabCommand}"
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="0,0,4,0"/>
                 <Button
-                    Click="Button_HistoryQuery"
                     Content="SHOW HISTORY"
-                    Style="{StaticResource MaterialDesignFlatButton}"/>
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Command="{Binding ShowHistoryCommand}"/>
 
             </StackPanel>
         </materialDesign:Card>
@@ -97,7 +130,15 @@
                 Grid.Column="0"
                 Margin="0,0,12,0"
                 Padding="4">
-            <TreeView x:Name="ItemsTree"/>
+            <TreeView x:Name="ItemsTree"
+                      ItemsSource="{Binding Servers}">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+            </TreeView>
+
         </materialDesign:Card>
 
         <!-- Query tabs -->
@@ -106,6 +147,9 @@
                 Margin="0,0,0,12">
             <TabControl
                     x:Name="QueryTabs"
+                    ItemsSource="{Binding QueryTabs.Tabs}"
+                    SelectedItem="{Binding QueryTabs.SelectedTab}"
+                    ItemTemplate="{StaticResource QueryTabHeaderTemplate}"
                     materialDesign:ColorZoneAssist.Mode="PrimaryLight"/>
         </materialDesign:Card>
 
@@ -125,14 +169,15 @@
 
                         <DataGrid
                             x:Name="ResultsGrid"
+                            ItemsSource="{Binding QueryTabs.SelectedTab.QueryResults}"
                             Margin="4"/>
 
                     </TabItem>
                     <TabItem Header="Message">
 
-                        <TextBox
+                        <TextBlock
                             x:Name="MessageTextBlock"
-                            BorderThickness="0"
+                            Text="{Binding QueryTabs.SelectedTab.StatusMessage}"
                             Margin="8"/>
 
                     </TabItem>
@@ -142,6 +187,7 @@
                 <!-- Execution timer -->
                 <TextBlock
                     x:Name="ExecutionTimeBlock"
+                    Text="{Binding QueryTabs.SelectedTab.ExecutionTimerText}"
                     Grid.Row="1"
                     Margin="8,4,8,8"
                     HorizontalAlignment="Right"

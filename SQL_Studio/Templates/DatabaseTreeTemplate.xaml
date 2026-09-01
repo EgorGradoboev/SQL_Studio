@@ -1,0 +1,48 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:SQL_Studio.ViewModels">
+
+    <HierarchicalDataTemplate DataType="{x:Type vm:ServerViewModel}" ItemsSource="{Binding Databases}">
+        <TextBlock Text="{Binding ServerName}"/>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type vm:DatabaseViewModel}" ItemsSource="{Binding Tables}">
+        <TextBlock Text="{Binding DatabaseName}">
+            <TextBlock.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        Header="Refresh"
+                        Command="{Binding PlacementTarget.DataContext.Refresh,
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                </ContextMenu>
+            </TextBlock.ContextMenu>
+        </TextBlock>
+    </HierarchicalDataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:TableViewModel}">
+        <TextBlock Text="{Binding TableName}">
+            <TextBlock.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        Header="Select top 100 rows"
+                        Command="{Binding PlacementTarget.DataContext.Select, 
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                    <MenuItem
+                        Header="Update rows"
+                        Command="{Binding PlacementTarget.DataContext.Update, 
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                    <MenuItem
+                        Header="Insert rows"
+                        Command="{Binding PlacementTarget.DataContext.Insert, 
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                    <MenuItem
+                        Header="Delete rows"
+                        Command="{Binding PlacementTarget.DataContext.Delete, 
+                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                </ContextMenu>
+            </TextBlock.ContextMenu>
+        </TextBlock>
+    </DataTemplate>
+
+</ResourceDictionary>

@@ -1,23 +1,7 @@
 ﻿using Npgsql;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Security.RightsManagement;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SQL_Studio
 {
@@ -32,7 +16,7 @@ namespace SQL_Studio
         public string Port { get; set; }
         public string FilePath { get; set; }
         public List<RecentConnection> RecentConnections { get; set; }
-        public NpgsqlConnection? Connection { get; private set; }
+        private NpgsqlConnection? _connection;
         private void RecentConnectionsComboBox_SelectionChanged (object sender, RoutedEventArgs e)
         {
             if (RecentConnectionsComboBox.SelectedItem is not RecentConnection selected)
@@ -62,8 +46,8 @@ namespace SQL_Studio
 
             try
             {
-                Connection = new NpgsqlConnection(connectionString);
-                await Connection.OpenAsync();                             
+                _connection = new NpgsqlConnection(connectionString);
+                await _connection.OpenAsync();                             
                 
 
                 RecentConnection item = new RecentConnection();
@@ -94,6 +78,14 @@ namespace SQL_Studio
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to connect to {ServerName} server: {ex.Message}");
+            }
+            finally
+            {
+                if (_connection != null)
+                {
+                    await _connection.CloseAsync();
+                    _connection.Dispose();
+                }                
             }
         }
         private async void Button_CancelConnect(object sender, RoutedEventArgs e)
