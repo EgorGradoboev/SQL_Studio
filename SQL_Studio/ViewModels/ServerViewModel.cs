@@ -14,13 +14,15 @@ namespace SQL_Studio.ViewModels
         private readonly QueryTabViewModel _queryTabs;
         private readonly ConnectionFactoryService _connectionFactory;
         private NpgsqlConnection _connection;
+        private IDialogService _dialogService;
         public ObservableCollection<DatabaseViewModel> Databases { get; } = new();
         public ServerViewModel(string serverName, QueryTabViewModel queryTabs,
-            ConnectionFactoryService connectionFactory)
+            ConnectionFactoryService connectionFactory, IDialogService dialogService)
         {            
             ServerName = serverName;
             _connectionFactory = connectionFactory;
             _queryTabs = queryTabs;
+            _dialogService = dialogService;
         }
         public async Task LoadDatabasesAsync()
         {
@@ -36,18 +38,21 @@ namespace SQL_Studio.ViewModels
                 while (await reader.ReadAsync())
                 {
                     Databases.Add(new DatabaseViewModel(reader.GetString(0),
-                        _queryTabs, _connectionFactory));
+                        _queryTabs, _connectionFactory, _dialogService));
                 }
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Failed to load tree of databases: {e.Message}");
+                _dialogService.ShowError($"Failed to load servers: {e.Message}");
                 return;
             }
             finally
             {
-                await _connection.CloseAsync();
-                await _connection.DisposeAsync();
+                if (_connection != null)
+                {
+                    await _connection.CloseAsync();
+                    await _connection.DisposeAsync();
+                }                
             }
         }
 

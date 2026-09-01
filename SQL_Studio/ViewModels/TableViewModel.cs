@@ -22,15 +22,17 @@ namespace SQL_Studio.ViewModels
         private ConnectionFactoryService _connectionFactory;
         private readonly QueryTabViewModel _queryTabs;
         private List<string> _columns = new List<string>();
+        private readonly IDialogService _dialogService;
         public TableViewModel(string tableName, string databaseName, int limitRows, 
             QueryTabViewModel queryTabs,
-            ConnectionFactoryService connectionFactory)
+            ConnectionFactoryService connectionFactory, IDialogService dialogService)
         {
             TableName = tableName;
             DatabaseName = databaseName;
             LimitRows = limitRows;
             _connectionFactory = connectionFactory;
             _queryTabs = queryTabs;
+            _dialogService = dialogService;
             Select = new RelayCommand(async () => await SelectTopRows());
             Update = new RelayCommand(async () => await UpdateRows());
             Insert = new RelayCommand(async () => await InsertRows());

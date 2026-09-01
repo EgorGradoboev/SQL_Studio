@@ -1,7 +1,8 @@
 ﻿using SQL_Studio.ViewModels;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace SQL_Studio
 {
@@ -23,7 +24,7 @@ namespace SQL_Studio
         private async void QueryTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             var textBox = (TextBox)sender;
-            var listBox = (ListBox)textBox.FindName("SuggestionsListBox");
+            var listBox = (ListBox)textBox.FindName("SuggestionsListBox");            
             if (textBox.DataContext is not QueryViewModel vm || !vm.IsAutoCompleteOpen)
                 return;
 

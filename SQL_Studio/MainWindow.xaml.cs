@@ -6,7 +6,6 @@ namespace SQL_Studio
 {
     public partial class MainWindow : Window
     {
-        private NpgsqlConnection? _connection;
         private string _databaseName;
         private string _serverName;
         private string _login;
@@ -15,8 +14,7 @@ namespace SQL_Studio
         private MainViewModel _mainViewModel;
         public MainWindow()
         {
-            InitializeComponent();
-            
+            InitializeComponent();            
         }        
     }
 }

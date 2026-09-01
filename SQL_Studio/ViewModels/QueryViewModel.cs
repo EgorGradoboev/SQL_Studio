@@ -62,16 +62,25 @@ namespace SQL_Studio.ViewModels
             get => _statusMessage;
             set { _statusMessage = value; OnpropertyChanged(); }
         }
+        private string? _selectedSuggestion;
+        public string? SelectedSuggestion
+        {
+            get => _selectedSuggestion;
+            set { _selectedSuggestion = value; OnpropertyChanged(); }
+        }
         private ObservableCollection<HistoryQueries> _historyQueries;
+        private readonly IDialogService _dialogService;
 
         public QueryViewModel(QueryExecutionService executionService, 
             ConnectionFactoryService connectionFactory, string databaseName,
-            int counter, ObservableCollection<HistoryQueries> historyQueries)
+            int counter, ObservableCollection<HistoryQueries> historyQueries,
+            IDialogService dialogService)
         {
             _databaseName = databaseName;
             _connectionFactory = connectionFactory;
             _executionService = executionService;
             _historyQueries = historyQueries;
+            _dialogService = dialogService;
             TabName = $"Query {counter}";            
             ExecuteCommand = new RelayCommand(async () => await ExecuteAsync());
             CancelCommand = new RelayCommand(async () => _executionCts?.Cancel());
@@ -147,6 +156,7 @@ namespace SQL_Studio.ViewModels
                 Suggestions.Add(m);
             }
             IsAutoCompleteOpen = matches.Count > 0;
+            SelectedSuggestion = Suggestions.FirstOrDefault();
         }
         public string GetCurrentWord(string text, int carretIndex)
         {
@@ -194,7 +204,7 @@ namespace SQL_Studio.ViewModels
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Failed to load tree of databases: {e.Message}");
+                _dialogService.ShowError($"Failed to load tree of databases: {e.Message}");
                 return tables;
             }
             finally

@@ -20,6 +20,7 @@ namespace SQL_Studio.ViewModels
         private NpgsqlConnection _connection;
         private readonly QueryTabViewModel _queryTabs;
         private readonly ConnectionFactoryService _connectionFactory;
+        private readonly IDialogService _dialogService;
         public ObservableCollection<TableViewModel> Tables { get; } = new();
         private bool _tablesLoaded;
         private bool _isExpanded;
@@ -38,11 +39,12 @@ namespace SQL_Studio.ViewModels
             }
         }
         public DatabaseViewModel(string databaseName, QueryTabViewModel queryTabs,
-            ConnectionFactoryService connectionFactory)
+            ConnectionFactoryService connectionFactory, IDialogService dialogService)
         {
             DatabaseName = databaseName;
             _connectionFactory = connectionFactory;
             _queryTabs = queryTabs;
+            _dialogService = dialogService;
             Refresh = new RelayCommand(RefreshTables);
         }
         public async void RefreshTables()
@@ -67,18 +69,21 @@ namespace SQL_Studio.ViewModels
                 while (await reader.ReadAsync())
                 {
                     Tables.Add(new TableViewModel(reader.GetString(0), DatabaseName, 
-                        _limitRows, _queryTabs, _connectionFactory));
+                        _limitRows, _queryTabs, _connectionFactory, _dialogService));
                 }
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Failed to load tree of databases: {e.Message}");
+                _dialogService.ShowError($"Failed to load tree of databases: {e.Message}");
                 return;
             }
             finally
             {
-                await _connection.CloseAsync();
-                await _connection.DisposeAsync();
+                if (_connection != null)
+                {
+                    await _connection.CloseAsync();
+                    await _connection.DisposeAsync();
+                }                
             }
             
         }

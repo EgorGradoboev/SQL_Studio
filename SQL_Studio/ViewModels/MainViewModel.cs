@@ -19,6 +19,7 @@ namespace SQL_Studio.ViewModels
         public ObservableCollection<ServerViewModel> Servers { get; } = new();
         private ConnectionFactoryService _connectionFactory;
         private string _databaseName;
+        private IDialogService _dialogService;
         public ObservableCollection<HistoryQueries> HistoryQueries { get; }
         public string FilePath { get; set; }
         public ICommand ShowHistoryCommand { get; }
@@ -27,11 +28,12 @@ namespace SQL_Studio.ViewModels
             _connectionFactory = connectionFactory;
             _databaseName = databaseName;
             var executionService = new QueryExecutionService();
+            _dialogService = new DialogService();
             HistoryQueries = LoadHistoryFromFile();
             HistoryQueries.CollectionChanged += (s, e) => SaveHistoryToFile();
 
-            QueryTabs = new QueryTabViewModel(_connectionFactory, executionService, _databaseName, HistoryQueries);
-            Servers.Add(new ServerViewModel(_databaseName, QueryTabs, _connectionFactory));
+            QueryTabs = new QueryTabViewModel(_connectionFactory, executionService, _databaseName, HistoryQueries, _dialogService);
+            Servers.Add(new ServerViewModel(_databaseName, QueryTabs, _connectionFactory, _dialogService));
             ShowHistoryCommand = new RelayCommand(ShowHistory);            
         }
         private void SaveHistoryToFile()
@@ -64,7 +66,7 @@ namespace SQL_Studio.ViewModels
         }
         public void AddNewServer(ConnectionFactoryService connectionFactory, string databaseName)
         {
-            Servers.Add(new ServerViewModel(databaseName, QueryTabs, connectionFactory));
+            Servers.Add(new ServerViewModel(databaseName, QueryTabs, connectionFactory, _dialogService));
         }
         public void ShowHistory()
         {            

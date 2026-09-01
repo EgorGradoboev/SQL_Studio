@@ -8,7 +8,7 @@ namespace SQL_Studio
     {
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ConnectToServer();
+            if (!await ConnectToServer()) return;
             ConnectionFactoryService connectionFactory =
                 new ConnectionFactoryService(_serverName, _port, _login, _password);
 
@@ -21,32 +21,28 @@ namespace SQL_Studio
         }
         private async void Button_ChangeServer(object sender, RoutedEventArgs e)
         {
-            ConnectToServer();
+            if (!await ConnectToServer()) return;
             ConnectionFactoryService connectionFactory =
                 new ConnectionFactoryService(_serverName, _port, _login, _password);
             _mainViewModel.AddNewServer(connectionFactory, _databaseName);
             var server = _mainViewModel.Servers.Last();
             await server.LoadDatabasesAsync();
         }
-        private async void Button_Disconnect(object sender, RoutedEventArgs e)
-        {
-
-        }
-        private async void ConnectToServer()
+        private async Task<bool> ConnectToServer()
         {
             var connectionWindow = new ConnectionWindow();
             connectionWindow.Owner = this;
             bool? result = connectionWindow.ShowDialog();
             if (result != true)
             {
-                return;
+                return false;
             }
             _serverName = connectionWindow.ServerName;
             _login = connectionWindow.Login;
             _password = connectionWindow.Password;
             _port = connectionWindow.Port;
             _databaseName = "postgres";
-            
+            return true;
         }
 
         

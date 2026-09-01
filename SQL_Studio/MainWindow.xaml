@@ -41,6 +41,7 @@
                         <ListBox
                             x:Name="SuggestionsListBox"
                             ItemsSource="{Binding Suggestions}"
+                            SelectedItem="{Binding SelectedSuggestion, Mode=TwoWay}"
                             BorderThickness="0"
                             Background="Transparent"/>
                     </materialDesign:Card>
