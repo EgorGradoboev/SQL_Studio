@@ -30,24 +30,8 @@ namespace SQL_Studio
         }
         private async void Button_Disconnect(object sender, RoutedEventArgs e)
         {
-            //try
-            //{
-            //    if (_connection is not null)
-            //    {
-            //        await _connection.CloseAsync();
-            //        _connection = null;
-            //        ItemsTree.Items.Clear();
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show($"Failed to disconnect from {_databaseName} database: {ex.Message}");
-            //    return;
-            //}
 
-            //MessageTextBlock.Text = $"Disconnected from {_databaseName} database";
         }
-
         private async void ConnectToServer()
         {
             var connectionWindow = new ConnectionWindow();

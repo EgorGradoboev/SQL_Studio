@@ -27,12 +27,14 @@ namespace SQL_Studio.ViewModels
         private readonly QueryExecutionService _executionService;
         private readonly ConnectionFactoryService _connectionFactory;
         private readonly string _databaseName;
+        private ObservableCollection<HistoryQueries> _historyQueries;
         public QueryTabViewModel(ConnectionFactoryService connectionFactory, 
-            QueryExecutionService executionService, string databaseName)
+            QueryExecutionService executionService, string databaseName, ObservableCollection<HistoryQueries> historyQueries)
         {
             _connectionFactory = connectionFactory;
             _executionService = executionService;
             _databaseName = databaseName;
+            _historyQueries = historyQueries;
             NewTabCommand = new RelayCommand(() => NewTab());
             CloseTabCommand = new RelayCommand(CloseTab);
         }
@@ -40,7 +42,7 @@ namespace SQL_Studio.ViewModels
         {
             _counter++;
             var tab = new QueryViewModel(_executionService, _connectionFactory, 
-                _databaseName, _counter);
+                _databaseName, _counter, _historyQueries);
             Tabs.Add(tab);
             SelectedTab = tab;
             return tab;

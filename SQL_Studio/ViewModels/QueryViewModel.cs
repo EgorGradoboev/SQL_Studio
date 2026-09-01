@@ -8,8 +8,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -23,7 +25,7 @@ namespace SQL_Studio.ViewModels
         private CancellationTokenSource? _executionCts;
         private ConnectionFactoryService _connectionFactory;
         private string _queryText = "";
-        private List<string>? _cachedTables;
+        private List<string>? _cachedTables;        
 
         public string TabName { get; set; }
         public ICommand ExecuteCommand { get; }
@@ -60,14 +62,16 @@ namespace SQL_Studio.ViewModels
             get => _statusMessage;
             set { _statusMessage = value; OnpropertyChanged(); }
         }
-        
+        private ObservableCollection<HistoryQueries> _historyQueries;
+
         public QueryViewModel(QueryExecutionService executionService, 
             ConnectionFactoryService connectionFactory, string databaseName,
-            int counter)
+            int counter, ObservableCollection<HistoryQueries> historyQueries)
         {
             _databaseName = databaseName;
             _connectionFactory = connectionFactory;
             _executionService = executionService;
+            _historyQueries = historyQueries;
             TabName = $"Query {counter}";            
             ExecuteCommand = new RelayCommand(async () => await ExecuteAsync());
             CancelCommand = new RelayCommand(async () => _executionCts?.Cancel());
@@ -85,12 +89,22 @@ namespace SQL_Studio.ViewModels
         {
             ExecutionTimerText = "Executing...";
             _executionCts = new CancellationTokenSource();
+            HistoryQueries query = new();
             Stopwatch executionTimer = new Stopwatch();
             executionTimer.Start();
+            DateTime startTime = DateTime.Now;
             try
             {
                 var connection = await GetConnectionAsync();
                 var result = await _executionService.ExecuteAsync(connection, QueryText, _executionCts.Token);
+                query.QueryText = QueryText;
+                if (_historyQueries.Count != 0)
+                {
+                    query.RowId = _historyQueries.Last().RowId + 1;
+                }
+                else query.RowId = 1;
+                query.ExecutionTime = startTime.ToString("hh:mm:ss");
+                _historyQueries.Add(query);
                 QueryResults = result.IsSelect ? result.ResultsView : null;
                 StatusMessage = result.IsSelect
                     ? $"Rows returned: {result.ResultsView!.Count}"
