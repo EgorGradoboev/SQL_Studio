@@ -17,7 +17,7 @@ namespace SQL_Studio.ViewModels
         public string DatabaseName { get; }
         public ICommand Refresh { get; }
         private int _limitRows = 100;
-        private NpgsqlConnection _connection;
+        private NpgsqlConnection? _connection;
         private readonly QueryTabViewModel _queryTabs;
         private readonly ConnectionFactoryService _connectionFactory;
         private readonly IDialogService _dialogService;

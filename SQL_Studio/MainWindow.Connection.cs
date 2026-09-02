@@ -8,7 +8,8 @@ namespace SQL_Studio
     {
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!await ConnectToServer()) return;
+            if (!await ConnectToServer() || _serverName == null || _port == null 
+                || _login == null || _password == null || _databaseName == null) return;
             ConnectionFactoryService connectionFactory =
                 new ConnectionFactoryService(_serverName, _port, _login, _password);
 
@@ -21,7 +22,8 @@ namespace SQL_Studio
         }
         private async void Button_ChangeServer(object sender, RoutedEventArgs e)
         {
-            if (!await ConnectToServer()) return;
+            if (!await ConnectToServer() || _serverName == null || _port == null
+                || _login == null || _password == null || _databaseName == null || _mainViewModel == null) return;
             ConnectionFactoryService connectionFactory =
                 new ConnectionFactoryService(_serverName, _port, _login, _password);
             _mainViewModel.AddNewServer(connectionFactory, _databaseName);

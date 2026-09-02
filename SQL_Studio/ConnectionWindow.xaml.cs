@@ -10,11 +10,11 @@ namespace SQL_Studio
     /// </summary>
     public partial class ConnectionWindow : Window
     {
-        public string ServerName { get; private set; }
-        public string Login { get; private set; }
-        public string Password { get; private set; }
-        public string Port { get; set; }
-        public string FilePath { get; set; }
+        public string? ServerName { get; private set; }
+        public string? Login { get; private set; }
+        public string? Password { get; private set; }
+        public string? Port { get; set; }
+        public string? FilePath { get; set; }
         public List<RecentConnection> RecentConnections { get; set; }
         private NpgsqlConnection? _connection;
         private void RecentConnectionsComboBox_SelectionChanged (object sender, RoutedEventArgs e)
@@ -72,7 +72,7 @@ namespace SQL_Studio
                 }               
 
                 string updatedJson = JsonSerializer.Serialize(RecentConnections);
-                File.WriteAllText(FilePath, updatedJson);
+                if (FilePath != null) File.WriteAllText(FilePath, updatedJson);              
                 DialogResult = true;
             }
             catch (Exception ex)

@@ -21,7 +21,7 @@ namespace SQL_Studio.ViewModels
         private string _databaseName;
         private IDialogService _dialogService;
         public ObservableCollection<HistoryQueries> HistoryQueries { get; }
-        public string FilePath { get; set; }
+        public string? FilePath { get; set; }
         public ICommand ShowHistoryCommand { get; }
         public MainViewModel(ConnectionFactoryService connectionFactory, string databaseName)
         {
@@ -39,9 +39,9 @@ namespace SQL_Studio.ViewModels
         private void SaveHistoryToFile()
         {
             string json = JsonSerializer.Serialize(HistoryQueries);
-            File.WriteAllText(FilePath, json);
+            if (FilePath != null) File.WriteAllText(FilePath, json);
         }
-        private  ObservableCollection<HistoryQueries> LoadHistoryFromFile()
+        private ObservableCollection<HistoryQueries> LoadHistoryFromFile()
         {
             string folder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string appFolder = System.IO.Path.Combine(folder, "SQL_Studio");

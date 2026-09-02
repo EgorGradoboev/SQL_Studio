@@ -13,7 +13,7 @@ namespace SQL_Studio.ViewModels
         public string ServerName { get; set; }
         private readonly QueryTabViewModel _queryTabs;
         private readonly ConnectionFactoryService _connectionFactory;
-        private NpgsqlConnection _connection;
+        private NpgsqlConnection? _connection;
         private IDialogService _dialogService;
         public ObservableCollection<DatabaseViewModel> Databases { get; } = new();
         public ServerViewModel(string serverName, QueryTabViewModel queryTabs,
