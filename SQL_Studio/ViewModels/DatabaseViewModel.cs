@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Npgsql;
 using SQL_Studio.Services;
+using SQL_Studio.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,7 +20,7 @@ namespace SQL_Studio.ViewModels
         private int _limitRows = 100;
         private NpgsqlConnection? _connection;
         private readonly QueryTabViewModel _queryTabs;
-        private readonly ConnectionFactoryService _connectionFactory;
+        private readonly IConnectionFactoryService _connectionFactory;
         private readonly IDialogService _dialogService;
         public ObservableCollection<TableViewModel> Tables { get; } = new();
         private bool _tablesLoaded;
@@ -39,7 +40,7 @@ namespace SQL_Studio.ViewModels
             }
         }
         public DatabaseViewModel(string databaseName, QueryTabViewModel queryTabs,
-            ConnectionFactoryService connectionFactory, IDialogService dialogService)
+            IConnectionFactoryService connectionFactory, IDialogService dialogService)
         {
             DatabaseName = databaseName;
             _connectionFactory = connectionFactory;

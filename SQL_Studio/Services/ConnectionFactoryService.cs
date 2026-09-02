@@ -1,11 +1,12 @@
 ﻿using Npgsql;
+using SQL_Studio.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace SQL_Studio.Services
 {
-    public class ConnectionFactoryService
+    public class ConnectionFactoryService : IConnectionFactoryService
     {
         private readonly string _serverName, _port, _login, _password;
         public ConnectionFactoryService(string serverName, string port, string login, string password)

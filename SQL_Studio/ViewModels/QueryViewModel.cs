@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Npgsql;
 using SQL_Studio.Services;
+using SQL_Studio.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,10 +21,10 @@ namespace SQL_Studio.ViewModels
 {
     public class QueryViewModel : INotifyPropertyChanged
     {
-        private readonly QueryExecutionService _executionService;
+        private readonly IQueryExecutionService _executionService;
         private NpgsqlConnection? _connection;
         private CancellationTokenSource? _executionCts;
-        private ConnectionFactoryService _connectionFactory;
+        private IConnectionFactoryService _connectionFactory;
         private string _queryText = "";
         private List<string>? _cachedTables;        
 
@@ -71,8 +72,8 @@ namespace SQL_Studio.ViewModels
         private ObservableCollection<HistoryQueries> _historyQueries;
         private readonly IDialogService _dialogService;
 
-        public QueryViewModel(QueryExecutionService executionService, 
-            ConnectionFactoryService connectionFactory, string databaseName,
+        public QueryViewModel(IQueryExecutionService executionService, 
+            IConnectionFactoryService connectionFactory, string databaseName,
             int counter, ObservableCollection<HistoryQueries> historyQueries,
             IDialogService dialogService)
         {

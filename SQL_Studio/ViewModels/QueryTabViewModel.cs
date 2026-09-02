@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Npgsql;
 using SQL_Studio.Services;
+using SQL_Studio.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,13 +25,13 @@ namespace SQL_Studio.ViewModels
         private int _counter = 0;
         public ICommand NewTabCommand { get; set; }
         public ICommand CloseTabCommand { get; set; }
-        private readonly QueryExecutionService _executionService;
-        private readonly ConnectionFactoryService _connectionFactory;
+        private readonly IQueryExecutionService _executionService;
+        private readonly IConnectionFactoryService _connectionFactory;
         private readonly string _databaseName;
         private ObservableCollection<HistoryQueries> _historyQueries;
         private readonly IDialogService _dialogService;
-        public QueryTabViewModel(ConnectionFactoryService connectionFactory, 
-            QueryExecutionService executionService, string databaseName, ObservableCollection<HistoryQueries> historyQueries,
+        public QueryTabViewModel(IConnectionFactoryService connectionFactory, 
+            IQueryExecutionService executionService, string databaseName, ObservableCollection<HistoryQueries> historyQueries,
             IDialogService dialogService)
         {
             _connectionFactory = connectionFactory;

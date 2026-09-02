@@ -1,4 +1,5 @@
 ﻿using SQL_Studio.Services;
+using SQL_Studio.Services.Interfaces;
 using SQL_Studio.ViewModels;
 using System.Windows;
 
@@ -10,7 +11,7 @@ namespace SQL_Studio
         {
             if (!await ConnectToServer() || _serverName == null || _port == null 
                 || _login == null || _password == null || _databaseName == null) return;
-            ConnectionFactoryService connectionFactory =
+            IConnectionFactoryService connectionFactory =
                 new ConnectionFactoryService(_serverName, _port, _login, _password);
 
             _mainViewModel = new MainViewModel(connectionFactory, _databaseName);
@@ -24,7 +25,7 @@ namespace SQL_Studio
         {
             if (!await ConnectToServer() || _serverName == null || _port == null
                 || _login == null || _password == null || _databaseName == null || _mainViewModel == null) return;
-            ConnectionFactoryService connectionFactory =
+            IConnectionFactoryService connectionFactory =
                 new ConnectionFactoryService(_serverName, _port, _login, _password);
             _mainViewModel.AddNewServer(connectionFactory, _databaseName);
             var server = _mainViewModel.Servers.Last();
