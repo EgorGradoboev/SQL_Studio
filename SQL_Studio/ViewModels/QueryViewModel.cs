@@ -42,10 +42,10 @@ namespace SQL_Studio.ViewModels
         {
             get => _queryText;
             set { _queryText = value; OnpropertyChanged(); }
-        }
-        private string _executionTimerText;
+        }        
         private string _databaseName;
-        public string ExecutionTimerText
+        private string? _executionTimerText;
+        public string? ExecutionTimerText
         {
             get => _executionTimerText;
             set { _executionTimerText = value; OnpropertyChanged(); }
