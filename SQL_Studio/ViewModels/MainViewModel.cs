@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Npgsql;
 using SQL_Studio.Services;
+using SQL_Studio.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,13 +18,13 @@ namespace SQL_Studio.ViewModels
     {
         public QueryTabViewModel QueryTabs { get; }
         public ObservableCollection<ServerViewModel> Servers { get; } = new();
-        private ConnectionFactoryService _connectionFactory;
+        private IConnectionFactoryService _connectionFactory;
         private string _databaseName;
         private IDialogService _dialogService;
         public ObservableCollection<HistoryQueries> HistoryQueries { get; }
         public string? FilePath { get; set; }
         public ICommand ShowHistoryCommand { get; }
-        public MainViewModel(ConnectionFactoryService connectionFactory, string databaseName)
+        public MainViewModel(IConnectionFactoryService connectionFactory, string databaseName)
         {
             _connectionFactory = connectionFactory;
             _databaseName = databaseName;
@@ -64,7 +65,7 @@ namespace SQL_Studio.ViewModels
 
             }
         }
-        public void AddNewServer(ConnectionFactoryService connectionFactory, string databaseName)
+        public void AddNewServer(IConnectionFactoryService connectionFactory, string databaseName)
         {
             Servers.Add(new ServerViewModel(databaseName, QueryTabs, connectionFactory, _dialogService));
         }

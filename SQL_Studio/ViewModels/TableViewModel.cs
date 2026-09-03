@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Npgsql;
 using SQL_Studio.Services;
+using SQL_Studio.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -19,13 +20,13 @@ namespace SQL_Studio.ViewModels
         public ICommand Update { get; }
         public ICommand Insert { get; }
         public ICommand Delete { get; }
-        private ConnectionFactoryService _connectionFactory;
+        private IConnectionFactoryService _connectionFactory;
         private readonly QueryTabViewModel _queryTabs;
         private List<string> _columns = new List<string>();
         private readonly IDialogService _dialogService;
         public TableViewModel(string tableName, string databaseName, int limitRows, 
             QueryTabViewModel queryTabs,
-            ConnectionFactoryService connectionFactory, IDialogService dialogService)
+            IConnectionFactoryService connectionFactory, IDialogService dialogService)
         {
             TableName = tableName;
             DatabaseName = databaseName;

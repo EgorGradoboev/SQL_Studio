@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using SQL_Studio.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,7 +12,7 @@ using System.Windows.Controls;
 
 namespace SQL_Studio.Services
 {
-    public class QueryExecutionService
+    public class QueryExecutionService : IQueryExecutionService
     {
         public class QueryExecutionResult
         {

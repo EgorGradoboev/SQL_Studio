@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SQL_Studio.Services
+namespace SQL_Studio.Services.Interfaces
 {
     public interface IDialogService
     {

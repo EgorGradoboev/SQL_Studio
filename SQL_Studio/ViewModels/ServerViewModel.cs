@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using SQL_Studio.Services;
+using SQL_Studio.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,12 +13,12 @@ namespace SQL_Studio.ViewModels
     {
         public string ServerName { get; set; }
         private readonly QueryTabViewModel _queryTabs;
-        private readonly ConnectionFactoryService _connectionFactory;
+        private readonly IConnectionFactoryService _connectionFactory;
         private NpgsqlConnection? _connection;
         private IDialogService _dialogService;
         public ObservableCollection<DatabaseViewModel> Databases { get; } = new();
         public ServerViewModel(string serverName, QueryTabViewModel queryTabs,
-            ConnectionFactoryService connectionFactory, IDialogService dialogService)
+            IConnectionFactoryService connectionFactory, IDialogService dialogService)
         {            
             ServerName = serverName;
             _connectionFactory = connectionFactory;
