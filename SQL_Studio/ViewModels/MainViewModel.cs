@@ -19,21 +19,24 @@ namespace SQL_Studio.ViewModels
         public QueryTabViewModel QueryTabs { get; }
         public ObservableCollection<ServerViewModel> Servers { get; } = new();
         private IConnectionFactoryService _connectionFactory;
-        private string _databaseName;
+        private IQueryExecutionService _executionService;
         private IDialogService _dialogService;
+        private string _databaseName;
         public ObservableCollection<HistoryQueries> HistoryQueries { get; }
         public string? FilePath { get; set; }
         public ICommand ShowHistoryCommand { get; }
-        public MainViewModel(IConnectionFactoryService connectionFactory, string databaseName)
+        public MainViewModel(
+            IConnectionFactoryService connectionFactory, IDialogService dialogService, IQueryExecutionService executionService,
+            string databaseName)
         {
             _connectionFactory = connectionFactory;
-            _databaseName = databaseName;
-            var executionService = new QueryExecutionService();
-            _dialogService = new DialogService();
+            _dialogService = dialogService;
+            _executionService = executionService;
+            _databaseName = databaseName;            
             HistoryQueries = LoadHistoryFromFile();
             HistoryQueries.CollectionChanged += (s, e) => SaveHistoryToFile();
 
-            QueryTabs = new QueryTabViewModel(_connectionFactory, executionService, _databaseName, HistoryQueries, _dialogService);
+            QueryTabs = new QueryTabViewModel(_connectionFactory, _executionService, _databaseName, HistoryQueries, _dialogService);
             Servers.Add(new ServerViewModel(_databaseName, QueryTabs, _connectionFactory, _dialogService));
             ShowHistoryCommand = new RelayCommand(ShowHistory);            
         }

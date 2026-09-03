@@ -16,6 +16,9 @@ namespace SQL_Studio
                 await vm.UpdateAutoComplete(textBox.CaretIndex);
 
                 var popup = (Popup)textBox.FindName("AutoCompletePopup");
+                if (popup == null)
+                    return;
+
                 var rect = textBox.GetRectFromCharacterIndex(textBox.CaretIndex);
                 popup.HorizontalOffset = rect.X;
                 popup.VerticalOffset = rect.Y + rect.Height;

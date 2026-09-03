@@ -9,13 +9,7 @@ namespace SQL_Studio
     {
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!await ConnectToServer() || _serverName == null || _port == null 
-                || _login == null || _password == null || _databaseName == null) return;
-            IConnectionFactoryService connectionFactory =
-                new ConnectionFactoryService(_serverName, _port, _login, _password);
-
-            _mainViewModel = new MainViewModel(connectionFactory, _databaseName);
-            DataContext = _mainViewModel;
+            if (_mainViewModel == null) return;
             foreach (var server in _mainViewModel.Servers)
             {
                 await server.LoadDatabasesAsync();
@@ -48,6 +42,6 @@ namespace SQL_Studio
             return true;
         }
 
-        
+
     }
 }
