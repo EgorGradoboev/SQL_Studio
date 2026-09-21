@@ -25,6 +25,7 @@ namespace SQL_Studio.Tests
             string result = vm.GetCurrentWord(text, caretIndex);
             Assert.Equal("use", result);
         }
+        [Fact] void 
         
     }
     public class FakeQueryExecutionService : IQueryExecutionService
