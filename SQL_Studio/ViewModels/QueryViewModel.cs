@@ -71,20 +71,77 @@ namespace SQL_Studio.ViewModels
         }
         private ObservableCollection<HistoryQueries> _historyQueries;
         private readonly IDialogService _dialogService;
+        private readonly ITextToSqlService? _textToSqlService;
+        private readonly IApiKeySetupService? _apiKeySetup;
 
-        public QueryViewModel(IQueryExecutionService executionService, 
+        public bool IsAiAvailable => _textToSqlService != null;
+        public bool IsApiKeyMissing => _apiKeySetup is { IsConfigured: false };
+        public ICommand AskAiCommand { get; }
+        public ICommand SetApiKeyCommand { get; }
+        private string _aiQuestion = "";
+        public string AiQuestion
+        {
+            get => _aiQuestion;
+            set { _aiQuestion = value; OnpropertyChanged(); }
+        }
+        private string _aiStatus = "";
+        public string AiStatus
+        {
+            get => _aiStatus;
+            set { _aiStatus = value; OnpropertyChanged(); }
+        }
+
+        public QueryViewModel(IQueryExecutionService executionService,
             IConnectionFactoryService connectionFactory, string databaseName,
             int counter, ObservableCollection<HistoryQueries> historyQueries,
-            IDialogService dialogService)
+            IDialogService dialogService, ITextToSqlService? textToSqlService = null,
+            IApiKeySetupService? apiKeySetup = null)
         {
             _databaseName = databaseName;
             _connectionFactory = connectionFactory;
             _executionService = executionService;
             _historyQueries = historyQueries;
             _dialogService = dialogService;
-            TabName = $"Query {counter}";            
+            _textToSqlService = textToSqlService;
+            _apiKeySetup = apiKeySetup;
+            TabName = $"Query {counter}";
             ExecuteCommand = new RelayCommand(async () => await ExecuteAsync());
             CancelCommand = new RelayCommand(async () => _executionCts?.Cancel());
+            AskAiCommand = new AsyncRelayCommand(AskAiAsync);
+            SetApiKeyCommand = new RelayCommand(() => PromptForApiKey());
+        }
+
+        private bool PromptForApiKey()
+        {
+            bool saved = _apiKeySetup?.PromptAndSave() ?? false;
+            OnpropertyChanged(nameof(IsApiKeyMissing));
+            return saved;
+        }
+
+        private async Task AskAiAsync(CancellationToken cancellationToken)
+        {
+            if (_textToSqlService == null || string.IsNullOrWhiteSpace(AiQuestion))
+                return;
+            if (IsApiKeyMissing && !PromptForApiKey())
+            {
+                AiStatus = "An Anthropic API key is required.";
+                return;
+            }
+            AiStatus = "Generating SQL...";
+            try
+            {
+                QueryText = await _textToSqlService.GenerateSqlAsync(
+                    _connectionFactory, _databaseName, AiQuestion, cancellationToken);
+                AiStatus = "Review the generated SQL, then press EXECUTE.";
+            }
+            catch (OperationCanceledException)
+            {
+                AiStatus = "Cancelled";
+            }
+            catch (Exception ex)
+            {
+                AiStatus = $"Failed to generate SQL: {ex.Message}";
+            }
         }
         private async Task<NpgsqlConnection> GetConnectionAsync()
         {

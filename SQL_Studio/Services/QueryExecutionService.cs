@@ -32,7 +32,7 @@ namespace SQL_Studio.Services
             CancellationToken cancellationToken)
         {
             using var command = new NpgsqlCommand(query, connection);
-            if (query.TrimStart().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
+            if (ReturnsRows(query))
             {
                 await using var reader = await command.ExecuteReaderAsync(cancellationToken);
                 var table = new DataTable();
@@ -42,6 +42,35 @@ namespace SQL_Studio.Services
             }
             var affectedRows = await command.ExecuteNonQueryAsync(cancellationToken);
             return QueryExecutionResult.ForCommand(affectedRows);
-        }        
+        }
+
+        private static bool ReturnsRows(string query)
+        {
+            int i = 0;
+            while (i < query.Length)
+            {
+                if (char.IsWhiteSpace(query[i]))
+                {
+                    i++;
+                }
+                else if (query.AsSpan(i).StartsWith("--"))
+                {
+                    int lineEnd = query.IndexOf('\n', i);
+                    i = lineEnd < 0 ? query.Length : lineEnd + 1;
+                }
+                else if (query.AsSpan(i).StartsWith("/*"))
+                {
+                    int blockEnd = query.IndexOf("*/", i + 2, StringComparison.Ordinal);
+                    i = blockEnd < 0 ? query.Length : blockEnd + 2;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            var rest = query.AsSpan(i);
+            return rest.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase)
+                || rest.StartsWith("WITH", StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
