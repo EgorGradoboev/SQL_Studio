@@ -49,6 +49,14 @@
                             Style="{StaticResource MaterialDesignRaisedButton}"
                             Margin="8,0,0,0"/>
                     </Grid>
+                    <Button
+                        Content="NEW TOPIC (CLEAR CHAT)"
+                        Command="{Binding ClearAiChatCommand}"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        HorizontalAlignment="Right"
+                        Margin="0,4,0,0"
+                        FontSize="10"
+                        Visibility="{Binding HasAiConversation, Converter={StaticResource BoolToVisibility}}"/>
                     <StackPanel Orientation="Horizontal"
                                 Margin="0,4,0,0"
                                 Visibility="{Binding IsApiKeyMissing, Converter={StaticResource BoolToVisibility}}">

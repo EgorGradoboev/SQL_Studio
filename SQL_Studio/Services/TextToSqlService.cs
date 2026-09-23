@@ -9,8 +9,9 @@ namespace SQL_Studio.Services
         private const string Model = "claude-opus-5";
 
         private const string SystemPrompt = """
-            You are a PostgreSQL expert. The user asks a question about their database in plain language.
-            Write exactly one read-only SQL query (SELECT or WITH ... SELECT) that answers it,
+            You are a PostgreSQL expert. The user asks questions about their database in plain language,
+            possibly as a follow-up to earlier questions in this conversation (e.g. "now only for last month").
+            For each question, write exactly one read-only SQL query (SELECT or WITH ... SELECT) that answers it,
             using only tables and columns from the schema below.
             Reply with the SQL only: no markdown fences, no explanations.
             If the question cannot be answered from this schema, reply with a single SQL comment
@@ -18,6 +19,9 @@ namespace SQL_Studio.Services
 
             Schema:
             """;
+
+        /// <summary>How many previous turns are replayed to the model. Keeps the request from growing without bound.</summary>
+        private const int MaxHistoryTurns = 6;
 
         private readonly ISchemaProvider _schemaProvider;
         private readonly IApiKeyStore _apiKeyStore;
@@ -31,7 +35,7 @@ namespace SQL_Studio.Services
         }
 
         public async Task<string> GenerateSqlAsync(IConnectionFactoryService connectionFactory, string databaseName,
-            string question, CancellationToken cancellationToken)
+            IReadOnlyList<SqlChatTurn> history, string question, CancellationToken cancellationToken)
         {
             string apiKey = _apiKeyStore.GetApiKey()
                 ?? throw new InvalidOperationException("Anthropic API key is not set.");
@@ -42,13 +46,21 @@ namespace SQL_Studio.Services
                 _clientApiKey = apiKey;
             }
 
+            var messages = new List<MessageParam>();
+            foreach (var turn in history.TakeLast(MaxHistoryTurns))
+            {
+                messages.Add(new() { Role = Role.User, Content = turn.Question });
+                messages.Add(new() { Role = Role.Assistant, Content = turn.GeneratedSql });
+            }
+            messages.Add(new() { Role = Role.User, Content = question });
+
             var response = await _client.Messages.Create(new MessageCreateParams
             {
                 Model = Model,
                 MaxTokens = 8000,
                 System = $"{SystemPrompt}\n{schema}",
                 OutputConfig = new OutputConfig { Effort = Effort.Medium },
-                Messages = [new() { Role = Role.User, Content = question }],
+                Messages = messages,
             }, cancellationToken);
 
             if (response.StopReason == "refusal")

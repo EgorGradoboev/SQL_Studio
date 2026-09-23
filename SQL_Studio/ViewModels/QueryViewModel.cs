@@ -74,10 +74,14 @@ namespace SQL_Studio.ViewModels
         private readonly ITextToSqlService? _textToSqlService;
         private readonly IApiKeySetupService? _apiKeySetup;
 
+        private readonly List<SqlChatTurn> _aiConversation = new();
+
         public bool IsAiAvailable => _textToSqlService != null;
         public bool IsApiKeyMissing => _apiKeySetup is { IsConfigured: false };
+        public bool HasAiConversation => _aiConversation.Count > 0;
         public ICommand AskAiCommand { get; }
         public ICommand SetApiKeyCommand { get; }
+        public ICommand ClearAiChatCommand { get; }
         private string _aiQuestion = "";
         public string AiQuestion
         {
@@ -109,6 +113,14 @@ namespace SQL_Studio.ViewModels
             CancelCommand = new RelayCommand(async () => _executionCts?.Cancel());
             AskAiCommand = new AsyncRelayCommand(AskAiAsync);
             SetApiKeyCommand = new RelayCommand(() => PromptForApiKey());
+            ClearAiChatCommand = new RelayCommand(ClearAiChat);
+        }
+
+        private void ClearAiChat()
+        {
+            _aiConversation.Clear();
+            AiStatus = "";
+            OnpropertyChanged(nameof(HasAiConversation));
         }
 
         private bool PromptForApiKey()
@@ -128,11 +140,17 @@ namespace SQL_Studio.ViewModels
                 return;
             }
             AiStatus = "Generating SQL...";
+            string question = AiQuestion;
             try
             {
                 QueryText = await _textToSqlService.GenerateSqlAsync(
-                    _connectionFactory, _databaseName, AiQuestion, cancellationToken);
-                AiStatus = "Review the generated SQL, then press EXECUTE.";
+                    _connectionFactory, _databaseName, _aiConversation, question, cancellationToken);
+                _aiConversation.Add(new SqlChatTurn(question, QueryText));
+                OnpropertyChanged(nameof(HasAiConversation));
+                AiQuestion = "";
+                AiStatus = IsMutatingQuery(QueryText)
+                        ? "Warning: this query modifies data. Review it carefully before executing."
+                        : "Review the generated SQL, then press EXECUTE. Ask a follow-up to refine it.";
             }
             catch (OperationCanceledException)
             {
@@ -274,6 +292,13 @@ namespace SQL_Studio.ViewModels
                 }                
             }
 
+        }
+        private static readonly string[] MutatingKeywords = { "DELETE", "INSERT", "UPDATE", "DROP", "ALTER", "TRUNCATE" };
+
+        private static bool IsMutatingQuery(string sql)
+        {
+            string trimmed = sql.TrimStart();
+            return MutatingKeywords.Any(k => trimmed.StartsWith(k, StringComparison.OrdinalIgnoreCase));
         }
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnpropertyChanged([CallerMemberName] string? name = null)
