@@ -23,6 +23,10 @@ namespace SQL_Studio
 
             services.AddSingleton<IQueryExecutionService, QueryExecutionService>();
             services.AddSingleton<IDialogService, DialogService>();
+            services.AddSingleton<IApiKeyStore, ApiKeyStore>();
+            services.AddSingleton<IApiKeySetupService, ApiKeySetupService>();
+            services.AddSingleton<ISchemaProvider, SchemaProvider>();
+            services.AddSingleton<ITextToSqlService, TextToSqlService>();
             services.AddTransient<ConnectionWindow>();
             services.AddTransient<HistoryWindow>();
 
@@ -51,7 +55,9 @@ namespace SQL_Studio
             string databaseName = "postgres";
             var mainWindow = new MainWindow(
                 connectionFactoryService, dialogService, executionService,
-                connectionWindow.ServerName, databaseName);
+                connectionWindow.ServerName, databaseName,
+                _serviceProvider.GetRequiredService<ITextToSqlService>(),
+                _serviceProvider.GetRequiredService<IApiKeySetupService>());
             
             mainWindow.Show();
             ShutdownMode = ShutdownMode.OnLastWindowClose;

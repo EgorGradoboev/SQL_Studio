@@ -19,7 +19,8 @@ namespace SQL_Studio
         private IQueryExecutionService _executionService;
         public MainWindow(
             IConnectionFactoryService connectionFactoryService,IDialogService dialogService, IQueryExecutionService executionService,
-            string serverName, string databaseName)
+            string serverName, string databaseName, ITextToSqlService? textToSqlService = null,
+            IApiKeySetupService? apiKeySetup = null)
         {
             _databaseName = databaseName;
             _connectionFactory = connectionFactoryService;
@@ -27,7 +28,7 @@ namespace SQL_Studio
             _executionService = executionService;
             _mainViewModel = new MainViewModel(
                 _connectionFactory, _dialogService, _executionService, 
-                _databaseName);            
+                _databaseName, textToSqlService, apiKeySetup);
             DataContext = _mainViewModel;
             InitializeComponent();            
         }        

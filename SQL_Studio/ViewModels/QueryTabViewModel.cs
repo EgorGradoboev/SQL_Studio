@@ -30,10 +30,15 @@ namespace SQL_Studio.ViewModels
         private readonly string _databaseName;
         private ObservableCollection<HistoryQueries> _historyQueries;
         private readonly IDialogService _dialogService;
-        public QueryTabViewModel(IConnectionFactoryService connectionFactory, 
+        private readonly ITextToSqlService? _textToSqlService;
+        private readonly IApiKeySetupService? _apiKeySetup;
+        public QueryTabViewModel(IConnectionFactoryService connectionFactory,
             IQueryExecutionService executionService, string databaseName, ObservableCollection<HistoryQueries> historyQueries,
-            IDialogService dialogService)
+            IDialogService dialogService, ITextToSqlService? textToSqlService = null,
+            IApiKeySetupService? apiKeySetup = null)
         {
+            _textToSqlService = textToSqlService;
+            _apiKeySetup = apiKeySetup;
             _connectionFactory = connectionFactory;
             _executionService = executionService;
             _databaseName = databaseName;
@@ -46,7 +51,7 @@ namespace SQL_Studio.ViewModels
         {
             _counter++;
             var tab = new QueryViewModel(_executionService, _connectionFactory, 
-                _databaseName, _counter, _historyQueries, _dialogService);
+                _databaseName, _counter, _historyQueries, _dialogService, _textToSqlService, _apiKeySetup);
             Tabs.Add(tab);
             SelectedTab = tab;
             return tab;

@@ -15,10 +15,65 @@
         Background="{DynamicResource MaterialDesignPaper}">
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
         <DataTemplate DataType="{x:Type vm:QueryViewModel}">
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Ask AI -->
+                <StackPanel Grid.Row="0"
+                            Margin="4,4,4,8"
+                            Visibility="{Binding IsAiAvailable, Converter={StaticResource BoolToVisibility}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            Grid.Column="0"
+                            Text="{Binding AiQuestion, UpdateSourceTrigger=PropertyChanged}"
+                            materialDesign:HintAssist.Hint="Ask your database in plain language..."
+                            VerticalAlignment="Center">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Return" Command="{Binding AskAiCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        <Button
+                            Grid.Column="1"
+                            Content="ASK AI"
+                            Command="{Binding AskAiCommand}"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Margin="8,0,0,0"/>
+                    </Grid>
+                    <Button
+                        Content="NEW TOPIC (CLEAR CHAT)"
+                        Command="{Binding ClearAiChatCommand}"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        HorizontalAlignment="Right"
+                        Margin="0,4,0,0"
+                        FontSize="10"
+                        Visibility="{Binding HasAiConversation, Converter={StaticResource BoolToVisibility}}"/>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,4,0,0"
+                                Visibility="{Binding IsApiKeyMissing, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="Anthropic API key is not set."
+                                   Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                   VerticalAlignment="Center"/>
+                        <Button Content="SET KEY"
+                                Command="{Binding SetApiKeyCommand}"
+                                Style="{StaticResource MaterialDesignFlatButton}"
+                                Margin="8,0,0,0"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding AiStatus}" Margin="0,4,0,0" Opacity="0.7"/>
+                </StackPanel>
+
                 <TextBox
                     x:Name="QueryTextBox"
+                    Grid.Row="1"
                     Text="{Binding QueryText, UpdateSourceTrigger=PropertyChanged}"
                     TextChanged="QueryTextBox_TextChanged"
                     PreviewKeyDown="QueryTextBox_PreviewKeyDown"
@@ -26,6 +81,7 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"/>
                 <Popup
+                    Grid.Row="1"
                     x:Name="AutoCompletePopup"
                     IsOpen="{Binding IsAutoCompleteOpen}"
                     PlacementTarget="{Binding ElementName=QueryTextBox}"

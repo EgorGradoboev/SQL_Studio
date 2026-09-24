@@ -7,7 +7,8 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Connect to server"
-        Height="380" Width="340"
+        Width="340"
+        SizeToContent="Height"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         FontFamily="{DynamicResource MaterialDesignFont}"
@@ -22,7 +23,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
@@ -64,7 +64,8 @@
                 materialDesign:HintAssist.Hint="Password"/>
 
             <StackPanel
-                Grid.Row="6"
+                Grid.Row="5"
+                Margin="0,8,0,0"
                 Orientation="Horizontal"
                 HorizontalAlignment="Right">
                 <Button

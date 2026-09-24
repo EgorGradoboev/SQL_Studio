@@ -71,20 +71,95 @@ namespace SQL_Studio.ViewModels
         }
         private ObservableCollection<HistoryQueries> _historyQueries;
         private readonly IDialogService _dialogService;
+        private readonly ITextToSqlService? _textToSqlService;
+        private readonly IApiKeySetupService? _apiKeySetup;
 
-        public QueryViewModel(IQueryExecutionService executionService, 
+        private readonly List<SqlChatTurn> _aiConversation = new();
+
+        public bool IsAiAvailable => _textToSqlService != null;
+        public bool IsApiKeyMissing => _apiKeySetup is { IsConfigured: false };
+        public bool HasAiConversation => _aiConversation.Count > 0;
+        public ICommand AskAiCommand { get; }
+        public ICommand SetApiKeyCommand { get; }
+        public ICommand ClearAiChatCommand { get; }
+        private string _aiQuestion = "";
+        public string AiQuestion
+        {
+            get => _aiQuestion;
+            set { _aiQuestion = value; OnpropertyChanged(); }
+        }
+        private string _aiStatus = "";
+        public string AiStatus
+        {
+            get => _aiStatus;
+            set { _aiStatus = value; OnpropertyChanged(); }
+        }
+
+        public QueryViewModel(IQueryExecutionService executionService,
             IConnectionFactoryService connectionFactory, string databaseName,
             int counter, ObservableCollection<HistoryQueries> historyQueries,
-            IDialogService dialogService)
+            IDialogService dialogService, ITextToSqlService? textToSqlService = null,
+            IApiKeySetupService? apiKeySetup = null)
         {
             _databaseName = databaseName;
             _connectionFactory = connectionFactory;
             _executionService = executionService;
             _historyQueries = historyQueries;
             _dialogService = dialogService;
-            TabName = $"Query {counter}";            
+            _textToSqlService = textToSqlService;
+            _apiKeySetup = apiKeySetup;
+            TabName = $"Query {counter}";
             ExecuteCommand = new RelayCommand(async () => await ExecuteAsync());
             CancelCommand = new RelayCommand(async () => _executionCts?.Cancel());
+            AskAiCommand = new AsyncRelayCommand(AskAiAsync);
+            SetApiKeyCommand = new RelayCommand(() => PromptForApiKey());
+            ClearAiChatCommand = new RelayCommand(ClearAiChat);
+        }
+
+        private void ClearAiChat()
+        {
+            _aiConversation.Clear();
+            AiStatus = "";
+            OnpropertyChanged(nameof(HasAiConversation));
+        }
+
+        private bool PromptForApiKey()
+        {
+            bool saved = _apiKeySetup?.PromptAndSave() ?? false;
+            OnpropertyChanged(nameof(IsApiKeyMissing));
+            return saved;
+        }
+
+        private async Task AskAiAsync(CancellationToken cancellationToken)
+        {
+            if (_textToSqlService == null || string.IsNullOrWhiteSpace(AiQuestion))
+                return;
+            if (IsApiKeyMissing && !PromptForApiKey())
+            {
+                AiStatus = "An Anthropic API key is required.";
+                return;
+            }
+            AiStatus = "Generating SQL...";
+            string question = AiQuestion;
+            try
+            {
+                QueryText = await _textToSqlService.GenerateSqlAsync(
+                    _connectionFactory, _databaseName, _aiConversation, question, cancellationToken);
+                _aiConversation.Add(new SqlChatTurn(question, QueryText));
+                OnpropertyChanged(nameof(HasAiConversation));
+                AiQuestion = "";
+                AiStatus = IsMutatingQuery(QueryText)
+                        ? "Warning: this query modifies data. Review it carefully before executing."
+                        : "Review the generated SQL, then press EXECUTE. Ask a follow-up to refine it.";
+            }
+            catch (OperationCanceledException)
+            {
+                AiStatus = "Cancelled";
+            }
+            catch (Exception ex)
+            {
+                AiStatus = $"Failed to generate SQL: {ex.Message}";
+            }
         }
         private async Task<NpgsqlConnection> GetConnectionAsync()
         {
@@ -217,6 +292,13 @@ namespace SQL_Studio.ViewModels
                 }                
             }
 
+        }
+        private static readonly string[] MutatingKeywords = { "DELETE", "INSERT", "UPDATE", "DROP", "ALTER", "TRUNCATE" };
+
+        private static bool IsMutatingQuery(string sql)
+        {
+            string trimmed = sql.TrimStart();
+            return MutatingKeywords.Any(k => trimmed.StartsWith(k, StringComparison.OrdinalIgnoreCase));
         }
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnpropertyChanged([CallerMemberName] string? name = null)
