@@ -47,19 +47,19 @@ namespace SQL_Studio.ViewModels
                 FROM {TableName}
                 LIMIT {LimitRows}
                 """;
-            var tab = _queryTabs.NewTab();
+            var tab = _queryTabs.NewTab(DatabaseName);
             tab.QueryText = query;
             await tab.ExecuteAsync();
         }
         public async Task UpdateRows()
-        {            
+        {
             string query = $"""
                 -- Paste your data instead of *_*
                 UPDATE {TableName}
                 SET *column* = ''
                 WHERE *_*;
                 """;
-            var tab = _queryTabs.NewTab();
+            var tab = _queryTabs.NewTab(DatabaseName);
             tab.QueryText = query;
         }
         public async Task InsertRows()
@@ -70,7 +70,7 @@ namespace SQL_Studio.ViewModels
                 INSERT INTO {TableName}({result})
                 VALUES(*_*)
                 """;
-            var tab = _queryTabs.NewTab();
+            var tab = _queryTabs.NewTab(DatabaseName);
             tab.QueryText = query;
         }
         public async Task DeleteRows()
@@ -81,7 +81,7 @@ namespace SQL_Studio.ViewModels
                 DELETE FROM {TableName}
                 WHERE *_*
                 """;
-            var tab = _queryTabs.NewTab();
+            var tab = _queryTabs.NewTab(DatabaseName);
             tab.QueryText = query;
         }
         private async Task<List<string>> GetColumnNames()

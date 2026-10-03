@@ -9,6 +9,7 @@
         mc:Ignorable="d"
         Loaded="MainWindow_Loaded"
         Title="SQL Studio" Height="650" Width="1000"
+        Icon="icon.ico"
         FontFamily="{DynamicResource MaterialDesignFont}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontSize="13"

@@ -21,7 +21,7 @@ namespace SQL_Studio
                 || _login == null || _password == null || _databaseName == null || _mainViewModel == null) return;
             IConnectionFactoryService connectionFactory =
                 new ConnectionFactoryService(_serverName, _port, _login, _password);
-            _mainViewModel.AddNewServer(connectionFactory, _databaseName);
+            _mainViewModel.AddNewServer(connectionFactory, _serverName);
             var server = _mainViewModel.Servers.Last();
             await server.LoadDatabasesAsync();
         }

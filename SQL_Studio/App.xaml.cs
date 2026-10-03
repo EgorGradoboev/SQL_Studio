@@ -17,6 +17,7 @@ namespace SQL_Studio
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            NpgsqlConnection.GlobalTypeMapper.UseNetTopologySuite();
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             var services = new ServiceCollection();

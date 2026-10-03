@@ -47,11 +47,11 @@ namespace SQL_Studio.ViewModels
             NewTabCommand = new RelayCommand(() => NewTab());
             CloseTabCommand = new RelayCommand(CloseTab);
         }
-        public QueryViewModel NewTab()
+        public QueryViewModel NewTab(string? databaseName = null)
         {
             _counter++;
-            var tab = new QueryViewModel(_executionService, _connectionFactory, 
-                _databaseName, _counter, _historyQueries, _dialogService, _textToSqlService, _apiKeySetup);
+            var tab = new QueryViewModel(_executionService, _connectionFactory,
+                databaseName ?? _databaseName, _counter, _historyQueries, _dialogService, _textToSqlService, _apiKeySetup);
             Tabs.Add(tab);
             SelectedTab = tab;
             return tab;

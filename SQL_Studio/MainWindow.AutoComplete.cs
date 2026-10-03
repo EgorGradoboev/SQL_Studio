@@ -11,24 +11,49 @@ namespace SQL_Studio
         private async void QueryTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var textBox = (TextBox)sender;
+            if (!textBox.IsLoaded)
+                return;
+
             if (textBox.DataContext is QueryViewModel vm)
             {
                 await vm.UpdateAutoComplete(textBox.CaretIndex);
 
-                var popup = (Popup)textBox.FindName("AutoCompletePopup");
-                if (popup == null)
-                    return;
+                try
+                {
+                    var popup = (Popup)textBox.FindName("AutoCompletePopup");
+                    if (popup == null)
+                        return;
 
-                var rect = textBox.GetRectFromCharacterIndex(textBox.CaretIndex);
-                popup.HorizontalOffset = rect.X;
-                popup.VerticalOffset = rect.Y + rect.Height;
+                    var rect = textBox.GetRectFromCharacterIndex(textBox.CaretIndex);
+                    popup.HorizontalOffset = rect.X;
+                    popup.VerticalOffset = rect.Y + rect.Height;
+                }
+                catch (Exception)
+                {
+                    // The tab (and its TextBox) may already be mid-teardown if the
+                    // user closed it while this handler was still running - nothing
+                    // to position in that case, just bail out.
+                    return;
+                }
             }
         }
         private async void QueryTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             var textBox = (TextBox)sender;
-            var listBox = (ListBox)textBox.FindName("SuggestionsListBox");            
-            if (textBox.DataContext is not QueryViewModel vm || !vm.IsAutoCompleteOpen)
+            if (!textBox.IsLoaded)
+                return;
+
+            ListBox listBox;
+            try
+            {
+                listBox = (ListBox)textBox.FindName("SuggestionsListBox");
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            if (listBox == null || textBox.DataContext is not QueryViewModel vm || !vm.IsAutoCompleteOpen)
                 return;
 
             if (e.Key == Key.Enter || e.Key == Key.Tab)

@@ -27,19 +27,19 @@ namespace SQL_Studio.ViewModels
         public ICommand ShowHistoryCommand { get; }
         public MainViewModel(
             IConnectionFactoryService connectionFactory, IDialogService dialogService, IQueryExecutionService executionService,
-            string databaseName, ITextToSqlService? textToSqlService = null,
+            string serverName, string databaseName, ITextToSqlService? textToSqlService = null,
             IApiKeySetupService? apiKeySetup = null)
         {
             _connectionFactory = connectionFactory;
             _dialogService = dialogService;
             _executionService = executionService;
-            _databaseName = databaseName;            
+            _databaseName = databaseName;
             HistoryQueries = LoadHistoryFromFile();
             HistoryQueries.CollectionChanged += (s, e) => SaveHistoryToFile();
 
             QueryTabs = new QueryTabViewModel(_connectionFactory, _executionService, _databaseName, HistoryQueries, _dialogService, textToSqlService, apiKeySetup);
-            Servers.Add(new ServerViewModel(_databaseName, QueryTabs, _connectionFactory, _dialogService));
-            ShowHistoryCommand = new RelayCommand(ShowHistory);            
+            Servers.Add(new ServerViewModel(serverName, QueryTabs, _connectionFactory, _dialogService));
+            ShowHistoryCommand = new RelayCommand(ShowHistory);
         }
         private void SaveHistoryToFile()
         {
@@ -69,9 +69,9 @@ namespace SQL_Studio.ViewModels
 
             }
         }
-        public void AddNewServer(IConnectionFactoryService connectionFactory, string databaseName)
+        public void AddNewServer(IConnectionFactoryService connectionFactory, string serverName)
         {
-            Servers.Add(new ServerViewModel(databaseName, QueryTabs, connectionFactory, _dialogService));
+            Servers.Add(new ServerViewModel(serverName, QueryTabs, connectionFactory, _dialogService));
         }
         public void ShowHistory()
         {            

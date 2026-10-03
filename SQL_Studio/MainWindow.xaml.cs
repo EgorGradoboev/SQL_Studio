@@ -27,8 +27,8 @@ namespace SQL_Studio
             _dialogService = dialogService;
             _executionService = executionService;
             _mainViewModel = new MainViewModel(
-                _connectionFactory, _dialogService, _executionService, 
-                _databaseName, textToSqlService, apiKeySetup);
+                _connectionFactory, _dialogService, _executionService,
+                serverName, _databaseName, textToSqlService, apiKeySetup);
             DataContext = _mainViewModel;
             InitializeComponent();            
         }        
